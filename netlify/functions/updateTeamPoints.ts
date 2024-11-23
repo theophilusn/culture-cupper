@@ -19,7 +19,7 @@ interface TeamPoints {
 
 export const handler = async () => {
   try {
-    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+    const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 
     // Fetch points log entries
     const pointsLogResponse = await octokit.repos.getContent({
