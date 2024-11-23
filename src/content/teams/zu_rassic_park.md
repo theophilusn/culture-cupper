@@ -1,5 +1,14 @@
 ---
 name: Zu-Rassic Park
 members:
-points: 100
+  - nick-kindrachuk
+  - sam-wilkinson
+  - tony-zuck
+  - dan-brown
+  - brian-kachur
+  - anja-gilje
+  - christianne-rooke
+  - gregor-butina
+  - haley-wiberg
+points: 140
 ---
