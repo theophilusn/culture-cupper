@@ -1,13 +1,16 @@
 import { Octokit } from "@octokit/rest";
 import matter from "gray-matter"; // Import gray-matter for front matter parsing
 import dotenv from "dotenv";
-import axios from "axios"; // Import axios to handle HTTP requests
+import slugify from "slugify"; // Import slugify to normalize team names
 
 dotenv.config();
 
 interface PointsLog {
   team: string;
   points: number;
+  date: string;
+  member: string;
+  reason: string;
 }
 
 interface TeamPoints {
@@ -30,20 +33,23 @@ export const handler = async () => {
     }
 
     // Fetch and parse points logs
-    const pointsLogs: PointsLog[] = await Promise.all(
-      pointsLogResponse.data.map(async (file: any) => {
-        if (!file.download_url) {
-          throw new Error(`File download URL missing for points log: ${file.path}`);
-        }
+    const pointsLogs: PointsLog[] = pointsLogResponse.data.map((file: any) => {
+      if (!file.content) {
+        throw new Error(`File content missing for points log: ${file.path}`);
+      }
 
-        // Fetch the content of the file using axios
-        const response = await axios.get(file.download_url);
-        if (typeof response.data !== 'string') {
-          throw new Error(`Unexpected response type for points log: ${file.path}`);
-        }
-        return JSON.parse(response.data) as PointsLog;
-      })
-    );
+      // Decode base64 content and parse using gray-matter
+      const fileContent = Buffer.from(file.content, "base64").toString();
+      const parsedContent = matter(fileContent);
+
+      return {
+        team: parsedContent.data.team,
+        points: parsedContent.data.points,
+        date: parsedContent.data.date,
+        member: parsedContent.data.member,
+        reason: parsedContent.data.reason,
+      } as PointsLog;
+    });
 
     // Calculate points per team
     const teamPoints: TeamPoints = pointsLogs.reduce((acc: TeamPoints, log: PointsLog) => {
@@ -56,7 +62,8 @@ export const handler = async () => {
 
     // Update each team's points in their Markdown files
     for (const [teamName, points] of Object.entries(teamPoints)) {
-      const teamPath = `src/content/teams/${teamName}.md`;
+      const normalizedTeamName = slugify(teamName, { lower: true, strict: true });
+      const teamPath = `src/content/teams/${normalizedTeamName}.md`;
       const teamResponse = await octokit.repos.getContent({
         owner: process.env.GITHUB_OWNER as string,
         repo: process.env.GITHUB_REPO as string,
