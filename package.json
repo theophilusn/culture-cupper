@@ -16,6 +16,7 @@
     "@octokit/rest": "^21.0.2",
     "apexcharts": "^4.0.0",
     "astro": "^4.16.13",
+    "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "flowbite": "^2.5.2",
     "gray-matter": "^4.0.3",

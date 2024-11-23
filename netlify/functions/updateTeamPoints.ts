@@ -1,6 +1,7 @@
 import { Octokit } from "@octokit/rest";
 import matter from "gray-matter"; // Import gray-matter for front matter parsing
 import dotenv from "dotenv";
+import axios from "axios"; // Import axios to handle HTTP requests
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ interface TeamPoints {
 
 export const handler = async () => {
   try {
-    const octokit = new Octokit({ auth: process.env.GH_TOKEN });
+    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     // Fetch points log entries
     const pointsLogResponse = await octokit.repos.getContent({
@@ -35,9 +36,9 @@ export const handler = async () => {
           throw new Error(`File download URL missing for points log: ${file.path}`);
         }
 
-        // Fetch the content of the file using the download URL
-        const response = await octokit.request(`GET ${file.download_url}`);
-        return JSON.parse(response.data) as PointsLog;
+        // Fetch the content of the file using axios
+        const response = await axios.get(file.download_url);
+        return response.data as PointsLog;
       })
     );
 
