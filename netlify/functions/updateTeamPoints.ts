@@ -28,13 +28,18 @@ export const handler = async () => {
       throw new Error("Unexpected response format");
     }
 
-    // Parse points logs
-    const pointsLogs: PointsLog[] = pointsLogResponse.data.map((file: any) => {
-      if (!file.content) {
-        throw new Error(`File content missing for points log: ${file.path}`);
-      }
-      return JSON.parse(Buffer.from(file.content, "base64").toString());
-    });
+    // Fetch and parse points logs
+    const pointsLogs: PointsLog[] = await Promise.all(
+      pointsLogResponse.data.map(async (file: any) => {
+        if (!file.download_url) {
+          throw new Error(`File download URL missing for points log: ${file.path}`);
+        }
+
+        // Fetch the content of the file using the download URL
+        const response = await octokit.request(`GET ${file.download_url}`);
+        return JSON.parse(response.data) as PointsLog;
+      })
+    );
 
     // Calculate points per team
     const teamPoints: TeamPoints = pointsLogs.reduce((acc: TeamPoints, log: PointsLog) => {
