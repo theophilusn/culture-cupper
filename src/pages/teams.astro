@@ -5,6 +5,14 @@ import Prose from "@/components/Prose.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import BannerMessage from "@/components/BannerMessage.astro";
 import ColumnChart from "@/components/Chart.jsx";
+import { getCollection } from "astro:content";
+
+const teamsCollection = await getCollection("teams");
+// 0: karen's faves; 1:mspaint ;2:the standard ; 3: zu rassic
+const teams: any[] = teamsCollection.map((team: any) => {
+  return team.data.points
+});
+
 ---
 
 <Layout title="Teams" description="Participants in this clash">
@@ -53,7 +61,7 @@ import ColumnChart from "@/components/Chart.jsx";
                 How things are breaking down:
               </h2>
 
-              <ColumnChart zurassicPoints={231} msPoints={400} karensFavPoints={80} standardPoints={121} client:only="react" />
+              <ColumnChart zurassicPoints={teams[3]} msPoints={teams[1]} karensFavPoints={teams[0]} standardPoints={teams[2]} client:only="react" />
             </div>
           </LayoutSticky>
         </Prose>
