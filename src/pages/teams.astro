@@ -4,6 +4,7 @@ import TopBar from "@/components/TopBar.astro";
 import Prose from "@/components/Prose.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import BannerMessage from "@/components/BannerMessage.astro";
+import ColumnChart from "@/components/Chart.jsx";
 ---
 
 <Layout title="Teams" description="Participants in this clash">
@@ -52,11 +53,7 @@ import BannerMessage from "@/components/BannerMessage.astro";
                 How things are breaking down:
               </h2>
 
-              <div
-                class="w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 mt-12"
-              >
-                <div id="column-chart"></div>
-              </div>
+              <ColumnChart zurassicPoints={231} msPoints={400} karensFavPoints={80} standardPoints={121} client:only="react" />
             </div>
           </LayoutSticky>
         </Prose>
@@ -64,107 +61,3 @@ import BannerMessage from "@/components/BannerMessage.astro";
     </section>
   </main>
 </Layout>
-
-<script>
-  import ApexCharts from "apexcharts";
-
-  const options = {
-    colors: ["#1A56DB"],
-    series: [
-      {
-        name: "Points",
-        color: "#1A56DB",
-        data: [
-          { x: "zu-rassic Park", y: 231 },
-          { x: "The Standard", y: 122 },
-          { x: "Karen's Favourites + Brian O.", y: 63 },
-          { x: "MS Paint 2.0", y: 421 }
-        ],
-      },
-    ],
-    chart: {
-      type: "bar",
-      height: "320px",
-      fontFamily: "Inter, sans-serif",
-      toolbar: {
-        show: false,
-      },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "70%",
-        borderRadiusApplication: "end",
-        borderRadius: 8,
-      },
-    },
-    tooltip: {
-      shared: true,
-      intersect: false,
-      style: {
-        fontFamily: "Inter, sans-serif",
-      },
-    },
-    states: {
-      hover: {
-        filter: {
-          type: "darken",
-          value: 1,
-        },
-      },
-    },
-    stroke: {
-      show: true,
-      width: 0,
-      colors: ["transparent"],
-    },
-    grid: {
-      show: false,
-      strokeDashArray: 4,
-      padding: {
-        left: 2,
-        right: 2,
-        top: -14,
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: false,
-    },
-    xaxis: {
-      floating: false,
-      labels: {
-        show: true,
-        style: {
-          fontFamily: "Inter, sans-serif",
-          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
-        },
-      },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    yaxis: {
-      show: false,
-    },
-    fill: {
-      opacity: 1,
-    },
-  };
-
-  if (
-    document.getElementById("column-chart") &&
-    typeof ApexCharts !== "undefined"
-  ) {
-    const chart = new ApexCharts(
-      document.getElementById("column-chart"),
-      options,
-    );
-    chart.render();
-  }
-</script>
