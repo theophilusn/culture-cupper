@@ -20,13 +20,14 @@ logo_url: https://zu.com/android-chrome-512x512.png
 media_folder: "src/assets/images"
 
 collections:
-  - name: "teams"
-    label: "Teams"
+  - label: "Teams"
+    name: "teams"
     label_singular: "Team"
     description: "Team"
     delete: false
     folder: "src/content/teams"
     create: true
+    identifier_field: name
     preview_path: "teams/{{slug}}"
     sortable_fields: ["name"]
     editor:
@@ -66,13 +67,14 @@ collections:
         max: 1000
         step: 1
 
-  - name: "members"
-    label: "Members"
+  - label: "Members"
+    name: "members"
     label_singular: "Member"
     description: "Member of a team"
     delete: false
     folder: "src/content/members"
     create: true
+    identifier_field: name
     preview_path: "members/{{slug}}"
     sortable_fields: ["name"]
     fields:
@@ -86,3 +88,54 @@ collections:
         widget: "string"
         required: true
         hint: "The team members image path"
+
+  - label: "Points Log"
+    name: "points_log"
+    label_singular: "Points Log"
+    description: "Log of points"
+    delete: false
+    folder: "src/content/points-log"
+    create: true
+    identifier_field: "{{slug}}"
+    preview_path: "points-log/{{slug}}"
+    sortable_fields: ["date"]
+    fields:
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        default: '{{now}}'
+        required: true
+        hint: "The date of the points log"
+      - label: "Team"
+        name: "team"
+        widget: "relation"
+        collection: "teams"
+        search_fields: ["name"]
+        value_field: "name"
+        display_fields: ["name"]
+        required: true
+        hint: "Select the team from the teams collection"
+      - label: "Member"
+        name: "member"
+        widget: "relation"
+        collection: "members"
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        required: false
+        hint: "Select the member from the members collection"
+      - label: "Points"
+        name: "points"
+        widget: "number"
+        default: 0
+        value_type: "int"
+        min: -50
+        max: 1000
+        step: 1
+        required: true
+        hint: "The points to add or subtract"
+      - label: "Reason"
+        name: "reason"
+        widget: "string"
+        required: true
+        hint: "The reason for the points log"
