@@ -6,5 +6,9 @@ import tailwind from "@astrojs/tailwind";
 export default defineConfig({
   site: "https://culture-cupper.netlify.app/",
 
-  integrations: [tailwind()],
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }),
+  ],
 });
