@@ -66,6 +66,7 @@ collections:
         min: -50
         max: 1000
         step: 1
+        disabled: true
 
   - label: "Members"
     name: "members"
@@ -103,7 +104,7 @@ collections:
       - label: "Date"
         name: "date"
         widget: "datetime"
-        default: '{{now}}'
+        default: "{{now}}"
         required: true
         hint: "The date of the points log"
       - label: "Team"

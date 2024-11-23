@@ -1,0 +1,13 @@
+name: Scheduled Update Team Points
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight (UTC)
+
+jobs:
+  run-scheduled-function:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Curl Netlify Function
+        run: curl -X GET https://culture-cupper.netlify.app/.netlify/functions/updateTeamPoints
