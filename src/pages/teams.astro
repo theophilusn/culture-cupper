@@ -4,6 +4,17 @@ import TopBar from "@/components/TopBar.astro";
 import Prose from "@/components/Prose.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import BannerMessage from "@/components/BannerMessage.astro";
+import { getCollection } from "astro:content";
+
+const teamsCollection = await getCollection("teams");
+type Team = {
+  name: string
+  points: number
+}
+const teams: Team[] = teamsCollection.map((team: any) => {
+  return {name: team.data.name, points:team.data.points}
+});
+
 ---
 
 <Layout title="Teams" description="Participants in this clash">
