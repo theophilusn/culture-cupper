@@ -29,9 +29,12 @@ export const handler = async () => {
     }
 
     // Parse points logs
-    const pointsLogs: PointsLog[] = pointsLogResponse.data.map((file: any) =>
-      JSON.parse(Buffer.from(file.content, "base64").toString())
-    );
+    const pointsLogs: PointsLog[] = pointsLogResponse.data.map((file: any) => {
+      if (!file.content) {
+        throw new Error(`File content missing for points log: ${file.path}`);
+      }
+      return JSON.parse(Buffer.from(file.content, "base64").toString());
+    });
 
     // Calculate points per team
     const teamPoints: TeamPoints = pointsLogs.reduce((acc: TeamPoints, log: PointsLog) => {
@@ -51,8 +54,8 @@ export const handler = async () => {
         path: teamPath,
       });
 
-      if (!("content" in teamResponse.data)) {
-        throw new Error(`Unexpected response format for team: ${teamName}`);
+      if (!("content" in teamResponse.data) || !teamResponse.data.content) {
+        throw new Error(`Unexpected response format or missing content for team: ${teamName}`);
       }
 
       // Parse the existing Markdown file using gray-matter
