@@ -57,6 +57,14 @@ collections:
         multiple: true
         required: true
         hint: "Select team members from the members collection"
+      - label: "Points"
+        name: "points"
+        widget: "number"
+        default: 0
+        value_type: "int"
+        min: -50
+        max: 1000
+        step: 1
 
   - name: "members"
     label: "Members"
