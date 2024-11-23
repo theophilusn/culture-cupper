@@ -81,3 +81,8 @@ collections:
         widget: "string"
         required: true
         hint: "The name of the member"
+      - label: "Image"
+        name: "image"
+        widget: "string"
+        required: true
+        hint: "The team members image path"
