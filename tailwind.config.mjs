@@ -2,7 +2,10 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 export default {
-  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+  content: [
+    "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}",
+    "./node_modules/flowbite/**/*.js",
+  ],
   theme: {
     screens: {
       xs: "400px",
@@ -164,5 +167,10 @@ export default {
       },
     },
   },
-}
-
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("flowbite/plugin")({
+      charts: true,
+    }),
+  ],
+};

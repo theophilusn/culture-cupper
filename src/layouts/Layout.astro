@@ -54,5 +54,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
   <body class="bg-zu-light-bg dark:bg-zu-dark-bg" data-page-id={pageId}>
     <slot />
     <Menu />
+    <script
+      is:inline
+      src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"
+    ></script>
   </body>
 </html>
