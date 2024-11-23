@@ -77,7 +77,7 @@ export const handler = async () => {
     for (const [teamName, points] of Object.entries(teamPoints)) {
       // Map team names to their respective filenames
       const teamFileNames: { [key: string]: string } = {
-        "Karen’s Favourites + Brian O": "karens-favourites.md",
+        "Karen’s Favourites + Brian O": "karens_favourites.md",
         "Ms Paint 2": "ms_paint_2.md",
         "The Standard": "the_standard.md",
         "Zu-Rassic Park": "zu_rassic_park.md",
