@@ -75,16 +75,41 @@ export const handler = async () => {
 
     // Update each team's points in their Markdown files
     for (const [teamName, points] of Object.entries(teamPoints)) {
-      const normalizedTeamName = slugify(teamName, { lower: true, strict: true });
-      const teamPath = `src/content/teams/${normalizedTeamName}.md`;
-      const teamResponse = await octokit.repos.getContent({
-        owner: process.env.GITHUB_OWNER as string,
-        repo: process.env.GITHUB_REPO as string,
-        path: teamPath,
-      });
+      // Map team names to their respective filenames
+      const teamFileNames: { [key: string]: string } = {
+        "Karen’s Favourites + Brian O": "karens-favourites.md",
+        "Ms Paint 2": "ms_paint_2.md",
+        "The Standard": "the_standard.md",
+        "Zu-Rassic Park": "zu_rassic_park.md",
+      };
+
+      const teamFileName = teamFileNames[teamName];
+      if (!teamFileName) {
+        console.error(`Team file not found for team: ${teamName}`);
+        continue; // Skip this team if the file is not found
+      }
+
+      const teamPath = `src/content/teams/${teamFileName}`;
+      let teamResponse;
+
+      try {
+        teamResponse = await octokit.repos.getContent({
+          owner: process.env.GITHUB_OWNER as string,
+          repo: process.env.GITHUB_REPO as string,
+          path: teamPath,
+        });
+      } catch (error: any) {
+        if (error.status === 404) {
+          console.error(`Team file not found for team: ${teamName}`);
+          continue; // Skip this team if the file is not found
+        } else {
+          throw error; // Re-throw if it's another error
+        }
+      }
 
       if (!("content" in teamResponse.data) || !teamResponse.data.content) {
-        throw new Error(`Unexpected response format or missing content for team: ${teamName}`);
+        console.error(`Unexpected response format or missing content for team: ${teamName}`);
+        continue; // Skip if content is missing
       }
 
       // Parse the existing Markdown file using gray-matter
