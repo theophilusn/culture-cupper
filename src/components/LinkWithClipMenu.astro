@@ -1,0 +1,32 @@
+---
+const { href, class: className } = Astro.props;
+---
+
+<a
+  class:list={[
+    "clip relative grid h-full items-end bg-zu-light-bg p-4 text-black after:!content-none md:p-6 dark:bg-zu-dark-bg dark:text-white",
+    className,
+  ]}
+  href={href}
+  rel={href.startsWith("https://") ? "external noopener" : null}
+  target={href.startsWith("https://") ? "_blank" : null}
+>
+  <slot />
+  <div
+    aria-hidden="true"
+    class="clip__child prose absolute inset-0 grid items-end bg-zu-light-primary p-4 text-white dark:prose-invert md:p-6 dark:bg-zu-dark-primary"
+  >
+    <slot />
+  </div>
+</a>
+
+<style>
+  .clip__child {
+    clip-path: rect(0 0 100% 0);
+    transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .clip:hover .clip__child {
+    clip-path: rect(0 100% 100% 0);
+  }
+</style>

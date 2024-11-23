@@ -1,0 +1,96 @@
+---
+import LinkWithClipMenu from "./LinkWithClipMenu.astro";
+import ButtonClose from "./ButtonClose.astro";
+---
+
+<div
+  id="menu"
+  class="menu fixed inset-0 hidden bg-zu-light-bg dark:bg-zu-dark-bg"
+>
+  <div class="wrapper">
+    <div class="relative">
+      <div class="absolute left-0 top-8 lg:-left-[60px]">
+        <a href="/" class="grid h-12 w-12 place-items-center bg-black">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="16"
+            viewBox="0 0 30 16"
+            fill="none"
+          >
+            <path
+              d="M24.8708 0.723633V9.01338C24.8708 9.78062 24.5412 10.404 23.8758 10.8715C23.2105 11.3391 22.2754 11.5728 21.0646 11.5728C19.8119 11.5728 18.8528 11.345 18.1935 10.8835C17.5341 10.422 17.2045 9.79862 17.2045 9.00141V0.723633H0.127441V4.58378H9.55606L0.127441 11.7167V15.3491H20.7709C22.1196 15.3491 23.4443 15.1812 24.5532 14.9415C25.6561 14.7017 26.6091 14.3361 27.3943 13.8566C28.1855 13.3711 28.7909 12.7597 29.2225 12.0284C29.6541 11.2971 29.8639 10.434 29.8639 9.45095V0.723633H24.8708ZM15.9038 5.41096C14.3393 6.84352 11.9896 9.403 12.589 11.381C12.613 11.435 12.637 11.4949 12.655 11.5489H7.26633C7.26633 11.5489 15.5021 5.54883 15.8498 5.2971C16.1915 5.04532 16.2514 5.08729 15.9038 5.41096Z"
+              fill="white"></path>
+          </svg>
+        </a>
+      </div>
+      <div class="absolute right-0 top-6 lg:-right-[88px]">
+        <ButtonClose id="menu-close" title="Close" data-testid="menu-close" />
+      </div>
+    </div>
+  </div>
+  <div class="mb-[1px] grid h-svh place-items-center">
+    <div
+      class="grid grid-cols-2 border-l border-t border-zu-light-body-text lg:grid-cols-3 dark:border-zu-dark-body-text"
+    >
+      <div
+        class="grid-item aspect-4/3 border-b border-r border-zu-light-body-text dark:border-zu-dark-body-text"
+      >
+        <LinkWithClipMenu href="/">
+          <div
+            class="whitespace-nowrap text-xl font-light sm:text-2xl lg:text-3xl"
+          >
+            / Home
+          </div>
+        </LinkWithClipMenu>
+      </div>
+      <div
+        class="grid-item aspect-4/3 border-b border-r border-zu-light-body-text dark:border-zu-dark-body-text"
+      >
+        <LinkWithClipMenu href="/services">
+          <div
+            class="whitespace-nowrap text-xl font-light sm:text-2xl lg:text-3xl"
+          >
+            / Teams
+          </div>
+        </LinkWithClipMenu>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.getElementById("menu-close")?.addEventListener("click", () => {
+      document.getElementById("menu")?.classList.toggle("menu--open");
+      document.body.style.overflow = "auto";
+    });
+  });
+</script>
+
+<style>
+  .menu {
+    display: hidden;
+    opacity: 0;
+    transition-property: overlay display opacity;
+    transition-duration: 0.3s;
+    transition-behavior: allow-discrete;
+    z-index: 20;
+  }
+  .menu--open {
+    display: block;
+    opacity: 1;
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  .grid-item {
+    width: min(40vw, 250px);
+  }
+
+  @media (min-width: 1024px) {
+    .grid-item {
+      width: min(25vw, 350px);
+    }
+  }
+</style>
