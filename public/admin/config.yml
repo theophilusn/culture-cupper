@@ -19,4 +19,50 @@ logo_url: https://zu.com/android-chrome-512x512.png
 
 media_folder: "src/assets/images"
 collections:
-  
+  - name: "teams"
+    label: "Teams"
+    label_singular: "Team"
+    description: "Team"
+    delete: false
+    folder: "src/content/teams"
+    create: true
+    preview_path: "teams/{{slug}}"
+    sortable_fields: ["name"]
+    editor:
+      preview: false
+    view_filters:
+      - label: Has Href
+        field: href
+        pattern: ""
+      - label: Published
+        field: published
+        pattern: true
+      - label: Unpublished
+        field: published
+        pattern: false
+    fields:
+      - {
+        label: "Name",
+        name: "name",
+        widget: string,
+        required: true,
+        hint: "The name of the team"
+        }
+      - {
+        label: "Members"
+        name: "members"
+        widget: list,
+        required: true,
+        hint: "The list of team members"
+      }
+
+  - name: "members"
+    label: "Members"
+    label_singular: "member"
+    description: "member of a team"
+    delete: false
+    folder: "src/content/members"
+    create: true
+    preview_path: "members/{{slug}}"
+    sortable_fields: ["name"]
+
