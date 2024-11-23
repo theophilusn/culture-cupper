@@ -1,0 +1,403 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+https://docs.astro.build/en/guides/integrations-guide/tailwind/#applybasestyles
+*/
+
+@layer base {
+  /*
+    Body highlight in light mode is a bit darker
+    Body highlight in dark mode is a bit lighter
+     */
+  :root {
+    --color-zu-light-primary: 255 61 0; /* #FF3D00 */
+    --color-zu-light-heading: 14 17 17; /* #0E1111 */
+    --color-zu-light-body-text: 14 17 17; /* #0E1111 */
+    --color-zu-light-body-highlight: 14 17 17; /* #0E1111 */
+    --color-zu-light-bg: 255 255 255; /* #FFFFFF */
+    /*--color-zu-light-bg-partner: 248 248 248; !* #F8F8F8 *!*/
+    --color-zu-light-bg-partner: 240 240 240; /* #F0F0F0 */
+    /*--color-zu-light-bg-partner: 235 235 235; !* #EBEBEB *!*/
+    /*--color-zu-light-bg-partner: 230 230 230; !* #E6E6E6 *! !* RECOMMEND *!*/
+    --color-zu-light-bg-footer: 14 17 17; /* #0E1111 */
+    --color-zu-light-placeholder: 119 119 119; /* #777 */
+    --color-zu-light-banner-heading: 250 250 250; /* #FAFAFA */
+
+    /*--color-zu-dark-primary: 139 0 0; !* #8b0000 *!*/
+    /*--color-zu-dark-primary: 128 0 0; !* #800000 *!*/
+    /*--color-zu-dark-primary: 220 20 60; !* #dc143c *!*/
+    /*--color-zu-dark-primary: 210 105 30; !* #d2691e *!*/
+    /*--color-zu-dark-primary: 0 128 128; !* #008080 *!*/
+    --color-zu-dark-primary: 178 44 0; /* #008080 */
+    /*--color-zu-dark-primary: 0 177 167; !* #00B1A7 *!*/
+    --color-zu-dark-heading: 236 236 236; /* #ECECEC */
+    --color-zu-dark-body-text: 173 173 173; /* #ADADAD */
+    --color-zu-dark-body-highlight: 196 196 196; /* #C4C4C4 */
+    --color-zu-dark-bg: 34 34 34; /* #222222 */
+    --color-zu-dark-bg-partner: 34 34 34; /* #222222 */
+    --color-zu-dark-bg-footer: 51 51 51; /* #333333 */
+    --color-zu-dark-placeholder: 119 119 119; /* #777 */
+    --color-zu-dark-banner-heading: 236 236 236; /* #ECECEC */
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* We don't want to choose a color that will compete with the primary color. */
+  ::selection {
+    background-color: #ffc4b2;
+    color: #0e1111;
+  }
+  @media (prefers-color-scheme: dark) {
+    ::selection {
+      background-color: rgb(var(--color-zu-dark-heading) / 0.75);
+      color: rgb(var(--color-zu-dark-bg));
+    }
+  }
+
+  :focus-visible {
+    outline-color: rgb(var(--color-zu-light-heading));
+    outline-offset: 6px;
+    z-index: 1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :focus-visible {
+      outline-color: rgb(var(--color-zu-dark-heading));
+    }
+  }
+}
+
+@layer components {
+  a[href^="http"]::after {
+    content: "";
+    width: 14px;
+    height: 14px;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"> <path d="M1 13L13 1" stroke="black"/> <path d="M7.3999 1H12.9999V7.4" stroke="black"/> </svg>');
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+    display: inline-flex;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+    background-color: currentColor;
+    background-repeat: no-repeat;
+  }
+  a[href^="http"]:hover::after {
+    transform: translate(1px, -1px);
+  }
+  @media (prefers-color-scheme: dark) {
+    a[href^="http"]::after {
+      background-color: currentColor;
+    }
+  }
+
+  footer a[href^="http"]::after {
+    background-color: currentColor;
+  }
+
+  /* LIST BULLETS */
+  .prose ul {
+    list-style-type: "/  " !important;
+    padding-left: 1rem;
+  }
+
+  .prose ul li::marker {
+    content: "/  ";
+  }
+
+  /* TEXT */
+  .text-heading {
+    color: var(--tw-prose-headings);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .text-heading {
+      color: var(--tw-prose-invert-headings);
+    }
+  }
+
+  .text-body-2 {
+    @apply text-xl/normal font-light md:text-2xl/normal;
+  }
+
+  .text-body-3 {
+    @apply text-base/normal font-light sm:text-xl/normal md:text-2xl/normal;
+  }
+
+  .text-heading-2 {
+    @apply text-heading text-[3rem] font-extralight leading-[1.4] md:text-[4rem] lg:text-[5rem] lg:leading-[1.1];
+  }
+
+  /* @see article list headings, case study solution sections */
+  .text-heading-3 {
+    @apply text-2xl/normal font-light md:text-3xl/normal lg:text-4xl/normal;
+  }
+
+  /* BUTTONS */
+  .button-md {
+    @apply inline-flex items-center border border-zu-light-body-text px-6 py-3 uppercase outline-offset-0 focus:outline focus:outline-1 active:bg-zu-light-primary active:text-white dark:border-zu-dark-body-text dark:active:bg-zu-dark-primary;
+  }
+
+  /* FORMS */
+  .floating-input {
+    @apply block w-full appearance-none border-0 border-b border-zu-light-body-text bg-transparent px-0 pb-2 pt-8 text-xl font-light text-black caret-zu-light-primary outline-none focus:border-black focus:ring-0 dark:border-zu-dark-body-text dark:text-white dark:caret-white dark:focus:border-white;
+  }
+  .floating-label {
+    @apply absolute top-8 -z-10 origin-[0] -translate-y-8 scale-90 transform font-light text-zu-light-body-text duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:start-0 peer-focus:-translate-y-8 peer-focus:scale-90 peer-focus:text-zu-light-body-text rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-zu-dark-body-text peer-focus:dark:text-zu-dark-body-text;
+  }
+  .textarea {
+    @apply block w-full border border-zu-light-body-text bg-transparent p-2.5 text-lg text-gray-900 caret-zu-light-primary outline-offset-0 focus:border-black focus:outline focus:outline-1 focus:ring-0 dark:border-zu-dark-body-text dark:text-white dark:caret-white dark:focus:border-white;
+  }
+  .optional-input {
+    > input {
+      padding-right: 80px;
+    }
+
+    &:after {
+      content: "Optional";
+      position: absolute;
+      right: 1px;
+      top: 55%;
+      font-size: 0.625rem;
+      font-weight: 300;
+    }
+  }
+
+  /* WRAPPER */
+  .wrapper {
+    display: grid;
+    grid-template-columns: 1fr min(1400px, 100% - 64px) 1fr;
+    grid-column-gap: 32px;
+  }
+
+  @media (min-width: 1024px) {
+    .wrapper {
+      grid-template-columns: 1fr min(1400px, 100% - 240px) 1fr;
+      grid-column-gap: 120px;
+    }
+  }
+  .wrapper > * {
+    grid-column: 2;
+  }
+
+  .wrapper-full {
+    width: 100%;
+    grid-column: 1 / 4;
+  }
+
+  .wrapper-divider > * {
+    @apply border-b border-zu-light-body-highlight dark:border-zu-dark-body-highlight;
+  }
+
+  /* CURSOR */
+  .cursor {
+    border-right: 4px solid white;
+    min-width: 10px;
+    height: 100%;
+    animation: cursor 0.8s alternate infinite;
+  }
+
+  /* BACKGROUND IMAGES */
+  .bg-skt-light {
+    background-image: linear-gradient(103deg, #d3178e 34.46%, #ff6d1b 94.78%);
+  }
+  .bg-sha-light {
+    background-image: linear-gradient(285deg, #61a644 14.07%, #026936 89.72%);
+  }
+  .bg-cor-light {
+    background-image: linear-gradient(149deg, #0270b3, #014c83);
+  }
+  .bg-sdb-light {
+    background: linear-gradient(297.48deg, #64a70b 3.86%, #046a38 77.11%);
+  }
+
+  .bg-pip-light {
+    background-image: linear-gradient(
+      148.89deg,
+      #0270b3 21.01%,
+      #014c83 81.02%
+    );
+  }
+  .bg-gms-light {
+    background-image: linear-gradient(149deg, #5b4b88 21.01%, #3d376a 81.02%);
+  }
+
+  .bg-zu-light-y-line {
+    background-image: linear-gradient(
+      to right,
+      transparent calc(50% - 2px),
+      rgb(var(--color-zu-light-body-text)) calc(50% - 2px),
+      rgb(var(--color-zu-light-body-text)) calc(50% + 2px),
+      transparent calc(50% + 2px)
+    );
+  }
+  .bg-zu-dark-y-line {
+    background-image: linear-gradient(
+      to right,
+      transparent calc(50% - 2px),
+      rgb(var(--color-zu-dark-body-text)) calc(50% - 2px),
+      rgb(var(--color-zu-dark-body-text)) calc(50% + 2px),
+      transparent calc(50% + 2px)
+    );
+  }
+
+  /* GRAYSCALE IMAGES */
+  @media not all and (hover: none) {
+    .grayscale-image {
+      @apply grayscale-[75%] transition-[filter] transition-all duration-500 ease-in-out hover:grayscale-0;
+    }
+  }
+
+  .color-scheme-dark {
+    color-scheme: dark;
+  }
+
+  .break-word {
+    word-break: break-word;
+  }
+}
+
+@layer utilities {
+  /* SPACING ADJUSTMENTS */
+
+  .pt-12-alt {
+    @apply pt-12 lg:pt-20;
+  }
+  .pb-12-alt {
+    @apply pb-12 lg:pb-20;
+  }
+  .pt-20-alt {
+    @apply pt-20 lg:pt-32;
+  }
+  .pb-20-alt {
+    @apply pb-20 lg:pb-32;
+  }
+  .pb-24-alt {
+    @apply pb-24 lg:pb-40;
+  }
+  .py-12-alt {
+    @apply py-12 lg:py-20;
+  }
+  .py-24-alt {
+    @apply py-24 lg:py-40;
+  }
+
+  .mt-12-alt {
+    @apply mt-12 lg:mt-20;
+  }
+  .mt-24-alt {
+    @apply mt-24 lg:mt-40;
+  }
+  .mb-12-alt {
+    @apply mb-12 lg:mb-20;
+  }
+  .mb-24-alt {
+    @apply mb-24 lg:mb-40;
+  }
+  .my-12-alt {
+    @apply my-12 lg:my-20;
+  }
+  .my-24-alt {
+    @apply my-24 lg:my-40;
+  }
+}
+
+@keyframes cursor {
+  0%,
+  49.99% {
+    border-right: 4px solid white;
+  }
+  50%,
+  100% {
+    border-right: 4px solid transparent;
+  }
+}
+
+@keyframes cursorDark {
+  0%,
+  49.99% {
+    border-right: 4px solid white;
+  }
+  50%,
+  100% {
+    border-right: 4px solid transparent;
+  }
+}
+
+/* CASE STUDY IMAGE REVEAL ANIMATIONS */
+
+@keyframes appear-from-left {
+  from {
+    opacity: 0.5;
+    clip-path: inset(30% 50% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.appear-from-left {
+  opacity: 0.5;
+  clip-path: inset(30% 50% 0 0);
+  animation: appear-from-left linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
+@keyframes appear-from-right {
+  from {
+    opacity: 0.5;
+    clip-path: inset(30% 0 0 50%);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.appear-from-right {
+  opacity: 0.5;
+  clip-path: inset(30% 0 0 50%);
+  animation: appear-from-right linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
+@keyframes appear-from-center {
+  from {
+    opacity: 0.5;
+    clip-path: inset(30% 30% 30% 30%);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.appear-from-center {
+  opacity: 0.5;
+  clip-path: inset(30% 30% 30% 30%);
+  animation: appear-from-center linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
+/* GLOBAL LINK STYLE */
+
+.article a,
+footer a,
+.link--default {
+  @apply hover:decoration-zu-light-primary hover:decoration-3 active:bg-zu-light-primary active:text-white active:decoration-white active:decoration-2 active:shadow-light-4 dark:active:bg-white dark:active:text-black dark:active:decoration-black dark:active:shadow-dark-4;
+}
+
+/* Ensure no underline on superscripted links */
+.article sup a,
+footer sup a,
+.link--default sup a {
+  @apply no-underline hover:no-underline active:no-underline;
+}

@@ -1,0 +1,58 @@
+---
+import { ViewTransitions } from "astro:transitions";
+import "../styles/base.css";
+import Menu from "../components/Menu.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  pageId?: string;
+}
+
+const { title, description, pageId = "basic" } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Basic Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Favicon and App Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000" />
+    <meta name="msapplication-TileColor" content="#000000" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      as="style"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <ViewTransitions />
+  </head>
+  <body class="bg-zu-light-bg dark:bg-zu-dark-bg" data-page-id={pageId}>
+    <slot />
+    <Menu />
+  </body>
+</html>

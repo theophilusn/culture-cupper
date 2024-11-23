@@ -1,16 +1,56 @@
 ---
-
+import Layout from "@/layouts/Layout.astro";
+import TopBar from "@/components/TopBar.astro";
+import BannerMessage from "@/components/BannerMessage.astro";
+import Footer from "@/components/Footer.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout
+  title="zu | Culture Cup"
+  description="-- PLACEHOLDER --"
+>
+  <TopBar />
+  <main>
+    <section
+      class="mb-16 bg-zu-light-primary dark:bg-zu-dark-primary"
+      data-nosnippet
+    >
+      <div class="wrapper">
+        <div class="grid h-[calc(100svh_-_3rem)] min-h-[600px]">
+          <div class="self-start">
+            <BannerMessage>
+              <p>A challenge of a lifetime</p>
+            </BannerMessage>
+          </div>
+
+          <div
+            class="self-end pb-20 text-[3.5rem] font-extralight leading-[1.4] text-zu-light-banner-heading sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] lg:leading-[1.1] xl:text-[9.5rem] dark:text-zu-dark-banner-heading"
+          >
+            Culture Cup<br />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .mask {
+    mask: linear-gradient(
+      90deg,
+      transparent,
+      white 20%,
+      white 80%,
+      transparent
+    );
+  }
+  .scroller__inner {
+    animation: scroll 80s linear infinite;
+  }
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 1.5rem));
+    }
+  }
+</style>
