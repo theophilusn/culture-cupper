@@ -33,23 +33,36 @@ export const handler = async () => {
     }
 
     // Fetch and parse points logs
-    const pointsLogs: PointsLog[] = pointsLogResponse.data.map((file: any) => {
-      if (!file.content) {
-        throw new Error(`File content missing for points log: ${file.path}`);
-      }
+    const pointsLogs: PointsLog[] = await Promise.all(
+      pointsLogResponse.data.map(async (file: any) => {
+        if (!file.path) {
+          throw new Error(`File path missing for points log: ${file.path}`);
+        }
 
-      // Decode base64 content and parse using gray-matter
-      const fileContent = Buffer.from(file.content, "base64").toString();
-      const parsedContent = matter(fileContent);
+        // Fetch the content of each file
+        const fileResponse = await octokit.repos.getContent({
+          owner: process.env.GITHUB_OWNER as string,
+          repo: process.env.GITHUB_REPO as string,
+          path: file.path,
+        });
 
-      return {
-        team: parsedContent.data.team,
-        points: parsedContent.data.points,
-        date: parsedContent.data.date,
-        member: parsedContent.data.member,
-        reason: parsedContent.data.reason,
-      } as PointsLog;
-    });
+        if (!("content" in fileResponse.data) || !fileResponse.data.content) {
+          throw new Error(`File content missing for points log: ${file.path}`);
+        }
+
+        // Decode base64 content and parse using gray-matter
+        const fileContent = Buffer.from(fileResponse.data.content, "base64").toString();
+        const parsedContent = matter(fileContent);
+
+        return {
+          team: parsedContent.data.team,
+          points: parsedContent.data.points,
+          date: parsedContent.data.date,
+          member: parsedContent.data.member,
+          reason: parsedContent.data.reason,
+        } as PointsLog;
+      })
+    );
 
     // Calculate points per team
     const teamPoints: TeamPoints = pointsLogs.reduce((acc: TeamPoints, log: PointsLog) => {
