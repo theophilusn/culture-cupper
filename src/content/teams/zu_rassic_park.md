@@ -10,5 +10,6 @@ members:
   - christianne-rooke
   - gregor-butina
   - haley-wiberg
+  - jasmine-pawliw
 points: 140
 ---
