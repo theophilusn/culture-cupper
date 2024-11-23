@@ -1,0 +1,22 @@
+publish_mode: editorial_workflow
+# Uncomment the following line to use the local backend | Used with `npx decap-server`
+# local_backend: true
+
+backend:
+  name: git-gateway
+  branch: main
+  squash_merges: true
+  commit_messages:
+    create: "feat: create {{collection}} '{{slug}}' by {{author-name}}"
+    update: "fix: update {{collection}} '{{slug}}' by {{author-name}}"
+    delete: "chore: delete {{collection}} '{{slug}}' by {{author-name}}"
+    uploadMedia: "feat: upload '{{path}}' by {{author-name}}"
+    deleteMedia: "chore: delete '{{path}}' by {{author-name}}"
+    openAuthoring: "{{message}}"
+
+site_url: "https://culture-cupper.netlify.app/"
+logo_url: https://zu.com/android-chrome-512x512.png
+
+media_folder: "src/assets/images"
+collections:
+  
