@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Curl Netlify Function
         env:
-           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            GITHUB_OWNER: theophilusn
            GITHUB_REPO: culture-cupper
         run: curl -X GET https://culture-cupper.netlify.app/.netlify/functions/updateTeamPoints

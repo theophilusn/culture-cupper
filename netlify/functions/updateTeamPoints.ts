@@ -16,7 +16,7 @@ interface TeamPoints {
 
 export const handler = async () => {
   try {
-    const octokit = new Octokit({ auth: process.env.GH_TOKEN });
+    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     // Fetch points log entries
     const pointsLogResponse = await octokit.repos.getContent({
@@ -38,7 +38,10 @@ export const handler = async () => {
 
         // Fetch the content of the file using axios
         const response = await axios.get(file.download_url);
-        return response.data as PointsLog;
+        if (typeof response.data !== 'string') {
+          throw new Error(`Unexpected response type for points log: ${file.path}`);
+        }
+        return JSON.parse(response.data) as PointsLog;
       })
     );
 
