@@ -1,4 +1,5 @@
 publish_mode: editorial_workflow
+
 # Uncomment the following line to use the local backend | Used with `npx decap-server`
 # local_backend: true
 
@@ -16,8 +17,8 @@ backend:
 
 site_url: "https://culture-cupper.netlify.app/"
 logo_url: https://zu.com/android-chrome-512x512.png
-
 media_folder: "src/assets/images"
+
 collections:
   - name: "teams"
     label: "Teams"
@@ -31,46 +32,44 @@ collections:
     editor:
       preview: false
     view_filters:
-      - label: Has Href
-        field: href
+      - label: "Has Href"
+        field: "href"
         pattern: ""
-      - label: Published
-        field: published
+      - label: "Published"
+        field: "published"
         pattern: true
-      - label: Unpublished
-        field: published
+      - label: "Unpublished"
+        field: "published"
         pattern: false
     fields:
-      - {
-        label: "Name",
-        name: "name",
-        widget: string,
-        required: true,
+      - label: "Name"
+        name: "name"
+        widget: "string"
+        required: true
         hint: "The name of the team"
-        }
-      - {
-        label: "Members",
-        name: "members",
-        widget: list,
-        required: true,
-        hint: "The list of team members"
-      }
+      - label: "Members"
+        name: "members"
+        widget: "relation"
+        collection: "members"
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        multiple: true
+        required: true
+        hint: "Select team members from the members collection"
 
   - name: "members"
     label: "Members"
-    label_singular: "member"
-    description: "member of a team"
+    label_singular: "Member"
+    description: "Member of a team"
     delete: false
     folder: "src/content/members"
     create: true
     preview_path: "members/{{slug}}"
     sortable_fields: ["name"]
-    field: 
-    - {
-        label: "Name",
-        name: "name",
-        widget: string,
-        required: true,
+    fields:
+      - label: "Name"
+        name: "name"
+        widget: "string"
+        required: true
         hint: "The name of the member"
-      }
-
