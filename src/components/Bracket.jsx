@@ -123,3 +123,76 @@ export const SFBracket = () => {
     />
   );
 }
+
+export const GuessZuBracket = () => {
+  const matches = [
+    {
+      id: 1,
+      nextMatchId: 5, // Semi-finals
+      tournamentRoundText: "Quarter-Final",
+      state: "SCHEDULED",
+      participants: [
+        { id: "1", name: "ROBERTA BARRINGTON", isWinner: false, status: null },
+        { id: "2", name: "JEN KORNEY", isWinner: false, status: null },
+      ],
+    },
+    {
+      id: 2,
+      nextMatchId: 5, // Semi-finals
+      tournamentRoundText: "Quarter-Final",
+      state: "SCHEDULED",
+      participants: [
+        { id: "3", name: "RACHEL ELSON", isWinner: false, status: null },
+        { id: "4", name: "ANJA GILJE", isWinner: false, status: null },
+      ],
+    },
+    {
+      id: 3,
+      nextMatchId: 6, // Semi-finals
+      tournamentRoundText: "Quarter-Final",
+      state: "SCHEDULED",
+      participants: [
+        { id: "5", name: "CHRISTIANNE ROOKE", isWinner: false, status: null },
+        { id: "6", name: "VALERIE CHAN", isWinner: false, status: null },
+      ],
+    },
+    {
+      id: 4,
+      nextMatchId: 6, // Semi-finals
+      tournamentRoundText: "Quarter-Final",
+      state: "SCHEDULED",
+      participants: [
+        { id: "7", name: "MELISSA ARNOTT", isWinner: false, status: null },
+        { id: "8", name: "SUSAN FROESS", isWinner: false, status: null },
+      ],
+    },
+    {
+      id: 5,
+      nextMatchId: 7, // Finals
+      tournamentRoundText: "Semi-Final",
+      state: "SCHEDULED",
+      participants: [],
+    },
+    {
+      id: 6,
+      nextMatchId: 7, // Finals
+      tournamentRoundText: "Semi-Final",
+      state: "SCHEDULED",
+      participants: [],
+    },
+    {
+      id: 7,
+      nextMatchId: null, // No further matches after finals
+      tournamentRoundText: "Final",
+      state: "SCHEDULED",
+      participants: [],
+    },
+  ];
+
+  return (
+    <div>
+      <SingleEliminationBracket matches={matches} matchComponent={Match} />
+    </div>
+  );
+};
+

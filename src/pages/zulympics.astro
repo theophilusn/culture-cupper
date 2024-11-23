@@ -4,7 +4,7 @@ import TopBar from "@/components/TopBar.astro";
 import Prose from "@/components/Prose.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import BannerMessage from "@/components/BannerMessage.astro";
-import { SFBracket } from "@/components/Bracket";
+import { GuessZuBracket, SFBracket } from "@/components/Bracket";
 ---
 
 <Layout title="zulympics" description="Matchups for the games">
@@ -32,6 +32,24 @@ import { SFBracket } from "@/components/Bracket";
             </div>
             <div slot="right" class="mt-2.5">
               <SFBracket client:only="react" />
+            </div>
+          </LayoutSticky>
+        </Prose>
+      </div>
+    </section>
+    <section>
+      <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
+        <Prose>
+          <LayoutSticky>
+            <div slot="left" class="h-full">
+              <h1
+                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
+              >
+                / Guess zu
+              </h1>
+            </div>
+            <div slot="right" class="mt-2.5">
+              <GuessZuBracket client:only="react" />
             </div>
           </LayoutSticky>
         </Prose>
