@@ -1,4 +1,6 @@
 ---
 name: Jason Leibel
-image: ./jason-leibel.jpeg
+position: Developer
+image: /src/assets/images/jason-leibel.jpeg
+slug: jason-leibel
 ---

@@ -1,4 +1,6 @@
 ---
 name: Jon Ronn
-image: ./jon-ronn.jpeg
+position: Developer
+image: /src/assets/images/jon-ronn.jpeg
+slug: jon-ronn
 ---

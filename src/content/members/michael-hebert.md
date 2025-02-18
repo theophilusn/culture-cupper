@@ -1,4 +1,6 @@
 ---
 name: Michael Hebert
-image: ./michael-hebert.jpeg
+position: Developer
+image: /src/assets/images/michael-hebert.jpeg
+slug: michael-hebert
 ---

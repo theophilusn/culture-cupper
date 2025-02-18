@@ -1,4 +1,6 @@
 ---
 name: Maximilian Gewers
-image: ./maximilian-gewers.jpeg
+position: Senior Developer
+image: /src/assets/images/maximilian-gewers.jpeg
+slug: maximilian-gewers
 ---

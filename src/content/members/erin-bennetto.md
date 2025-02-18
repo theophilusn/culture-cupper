@@ -1,4 +1,6 @@
 ---
 name: Erin Bennetto
-image: ./erin-bennetto.jpeg
+position: Designer
+image: /src/assets/images/erin-bennetto.jpeg
+slug: erin-bennetto
 ---

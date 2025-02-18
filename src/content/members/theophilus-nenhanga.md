@@ -1,4 +1,6 @@
 ---
 name: Theophilus Nenhanga
-image: ./theophilus-nenhanga.jpeg
+position: Intern Developer
+image: /src/assets/images/theophilus-nenhanga.jpeg
+slug: theophilus-nenhanga
 ---

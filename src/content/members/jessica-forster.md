@@ -1,4 +1,6 @@
 ---
 name: Jessica Forster
-image: ./jessica-forster.jpeg
+position: Project Manager
+image: /src/assets/images/jessica-forster.jpeg
+slug: jessica-forster
 ---

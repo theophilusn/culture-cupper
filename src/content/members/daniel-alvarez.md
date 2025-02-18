@@ -1,4 +1,6 @@
 ---
 name: Daniel Alvarez
-image: ./daniel-alvarez.jpeg
+position: Designer
+image: /src/assets/images/daniel-alvarez.jpeg
+slug: daniel-alvarez
 ---

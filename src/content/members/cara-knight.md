@@ -1,4 +1,6 @@
 ---
 name: Cara Knight
-image: ./cara-knight.jpeg
+position: Interim Design Director
+image: /src/assets/images/cara-knight.jpeg
+slug: cara-knight
 ---

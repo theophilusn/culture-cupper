@@ -1,4 +1,6 @@
 ---
 name: Amanda Ede
-image: ./amanda-ede.jpeg
+position: Designer
+image: /src/assets/images/amanda-ede.jpeg
+slug: amanda-ede
 ---

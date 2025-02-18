@@ -1,4 +1,6 @@
 ---
 name: Travis Robinson
-image: ./travis-robinson.jpeg
+position: Product Owner
+image: /src/assets/images/travis-robinson.jpeg
+slug: travis-robinson
 ---

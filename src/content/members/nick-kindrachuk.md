@@ -1,4 +1,6 @@
 ---
 name: Nick Kindrachuk
-image: ./nick-kindrachuk.jpeg
+position: Developer
+image: /src/assets/images/nick-kindrachuk.jpeg
+slug: nick-kindrachuk
 ---

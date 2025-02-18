@@ -1,4 +1,6 @@
 ---
 name: Rachel Elson
-image: ./rachel-elson.jpeg
+position: UX Strategist
+image: /src/assets/images/rachel-elson.jpeg
+slug: rachel-elson
 ---

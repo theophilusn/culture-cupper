@@ -1,4 +1,6 @@
 ---
 name: Michael Sabares
-image: ./michael-sabares.jpeg
+position: Developer
+image: /src/assets/images/michael-sabares.jpeg
+slug: michael-sabares
 ---

@@ -1,4 +1,6 @@
 ---
 name: Braeden George
-image: ./braeden-george.jpeg
+position: Business Development Manager
+image: /src/assets/images/braeden-george.jpeg
+slug: braeden-george
 ---

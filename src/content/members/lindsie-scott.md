@@ -1,4 +1,6 @@
 ---
 name: Lindsie Scott
-image: ./lindsie-scott.jpeg
+position: Account Strategist
+image: /src/assets/images/lindsie-scott.jpeg
+slug: lindsie-scott
 ---

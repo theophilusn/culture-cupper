@@ -11,6 +11,6 @@ members:
   - gregor-butina
   - haley-wiberg
   - jasmine-pawliw
-points: 10
+points: 126
 ---
 

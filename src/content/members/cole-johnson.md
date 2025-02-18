@@ -1,4 +1,6 @@
 ---
 name: Cole Johnson
-image: ./cole-johnson.jpeg
+position: Account Strategist
+image: /src/assets/images/cole-johnson.jpeg
+slug: cole-johnson
 ---

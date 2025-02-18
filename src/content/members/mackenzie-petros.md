@@ -1,4 +1,6 @@
 ---
 name: Mackenzie Petros
-image: ./mackenzie-petros.jpeg
+position: Product Owner
+image: /src/assets/images/mackenzie-petros.jpeg
+slug: mackenzie-petros
 ---

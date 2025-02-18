@@ -1,4 +1,6 @@
 ---
 name: Dan Brown
-image: ./dan-brown.jpeg
+position: IT Manager
+image: /src/assets/images/dan-brown.jpeg
+slug: dan-brown
 ---

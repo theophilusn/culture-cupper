@@ -27,41 +27,6 @@ const currentPath = pathname.slice(1);
           </a>
         </div>
         <div class="absolute right-0 top-8 lg:-right-[88px]">
-          <div
-            class="block cursor-pointer"
-            id="menu-open"
-            data-testid="menu-toggle"
-          >
-            <div>
-              <div class="grid grid-cols-2 gap-1 lg:grid-cols-3">
-                <div
-                  class="h-4 w-4 bg-zu-light-heading aria-selected:bg-zu-light-heading/35 dark:bg-zu-dark-heading dark:aria-selected:bg-zu-dark-heading/35"
-                  aria-selected={currentPath.startsWith("work")}
-                >
-                </div>
-                <div
-                  class="h-4 w-4 bg-zu-light-heading aria-selected:bg-zu-light-heading/35 dark:bg-zu-dark-heading dark:aria-selected:bg-zu-dark-heading/35"
-                  aria-selected={currentPath.startsWith("services")}
-                >
-                </div>
-                <div
-                  class="h-4 w-4 bg-zu-light-heading aria-selected:bg-zu-light-heading/35 dark:bg-zu-dark-heading dark:aria-selected:bg-zu-dark-heading/35"
-                  aria-selected={currentPath.startsWith("about")}
-                >
-                </div>
-                <div
-                  class="h-4 w-4 bg-zu-light-heading aria-selected:bg-zu-light-heading/35 dark:bg-zu-dark-heading dark:aria-selected:bg-zu-dark-heading/35"
-                  aria-selected={currentPath.startsWith("articles")}
-                >
-                </div>
-                <div
-                  class="h-4 w-4 bg-zu-light-heading aria-selected:bg-zu-light-heading/35 dark:bg-zu-dark-heading dark:aria-selected:bg-zu-dark-heading/35"
-                  aria-selected={currentPath.startsWith("careers")}
-                >
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

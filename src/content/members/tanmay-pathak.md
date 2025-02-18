@@ -1,4 +1,6 @@
 ---
 name: Tanmay Pathak
-image: ./tanmay-pathak.jpeg
+position: Developer
+image: /src/assets/images/tanmay-pathak.jpeg
+slug: tanmay-pathak
 ---

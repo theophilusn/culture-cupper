@@ -1,4 +1,6 @@
 ---
 name: Sam Wilkinson
-image: ./sam-wilkinson.jpeg
+position: Developer
+image: /src/assets/images/sam-wilkinson.jpeg
+slug: sam-wilkinson
 ---

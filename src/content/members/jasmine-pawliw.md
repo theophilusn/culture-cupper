@@ -1,4 +1,6 @@
 ---
 name: Jasmine Pawliw
-image: ./jasmine-pawliw.jpeg
+position: Intern Developer
+image: /src/assets/images/jasmine-pawliw.jpeg
+slug: jasmine-pawliw
 ---
