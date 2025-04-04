@@ -1,15 +1,16 @@
 ---
-name: M.S Paint 2.0
+name: MS Paint 2.0
 members:
-  - ryan-lejbak
   - kevin-warrington
-  - alanna-watt
-  - roberta-barrington
-  - jon-ronn
-  - grace-biemans
-  - jessica-forster
-  - melissa-arnott
+  - ryan-lejbak
   - travis-robinson
   - theophilus-nenhanga
-points: 151
+  - daniel-alvarez
+  - ryan-nieman
+  - erin-bennetto
+  - kirsti-hale
+  - jessica-forster
+  - amanda-ede
+goodPoints: 130
+badPoints: 15
 ---

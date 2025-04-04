@@ -7,11 +7,11 @@ export const collections = {
         pattern: "**/[^_]*.{md,mdx}",
         base: "./src/content/members",
       }),
-      schema: ({ image }) =>
+      schema: () =>
         z.object({
           name: z.string(),
           position: z.string(),
-          image: image(),
+          image: z.string(),
           description: z.string().default(""),
           isLeadership: z.boolean().default(false),
           order: z.number().default(99),
@@ -22,11 +22,33 @@ export const collections = {
       pattern: "**/[^_]*.{md,mdx}",
       base: "./src/content/teams",
     }),
+    schema: () => {
+      return z.object({
+        name: z.string(),
+        members: z.array(reference("members")),
+        goodPoints: z.number().default(0),
+        badPoints: z.number().default(0),
+      }).transform(data => {
+        return {
+          ...data,
+          points: data.goodPoints - data.badPoints
+        };
+      });
+    },
+  }),
+  games: defineCollection({
+    loader: glob({
+      pattern: "**/[^_]*.{md,mdx}",
+      base: "./src/content/games",
+    }),
     schema: () =>
       z.object({
         name: z.string(),
-        members: z.array(reference("members")),
-        points: z.number(),
+        description: z.string(),
+        date: z.string().optional(),
+        winner: z.string().optional(),
+        participants: z.array(reference("teams")).optional(),
+        points: z.number().optional(),
       }),
   }),
 };

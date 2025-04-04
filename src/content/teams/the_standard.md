@@ -11,5 +11,6 @@ members:
   - valerie-chan
   - rebecca-ready
   - mackenzie-petros
-points: 139
+goodPoints: 165
+badPoints: 26
 ---

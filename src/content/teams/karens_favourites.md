@@ -1,15 +1,16 @@
 ---
-name: Karen’s Favourites + Brian O
+name: Karen's Favourites
 members:
-  - kit-hillis
-  - michael-hebert
+  - karen-scherr
+  - rebecca-ready
   - rachel-elson
-  - brian-ohlmann
-  - maximilian-gewers
-  - braeden-george
-  - susan-froess
+  - roberta-barrington
+  - melissa-arnott
+  - cara-knight
   - meagan-maclean
-  - erin-bennetto
-  - amanda-ede
-points: 147
+  - maximilian-gewers
+  - mackenzie-petros
+  - michael-hebert
+goodPoints: 160
+badPoints: 38
 ---

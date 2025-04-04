@@ -8,14 +8,14 @@ import Prose from "@/components/Prose.astro";
 import { getCollection } from "astro:content";
 import ColumnChart from "@/components/Chart.jsx";
 import { GuessZuBracket, SFBracket } from "@/components/Bracket";
-import {Image} from "astro:assets";
 
 const teamsCollection = await getCollection("teams");
 const membersCollection = await getCollection("members");
+const gamesCollection = await getCollection("games");
 
-// 0: karen's faves; 1:mspaint ;2:the standard ; 3: zu rassic
+// Calculate total points (good - bad) for each team
 const teams: any[] = teamsCollection.map((team: any) => {
-  return team.data.points
+  return (team.data.goodPoints || 0) - (team.data.badPoints || 0);
 });
 ---
 
@@ -33,7 +33,6 @@ const teams: any[] = teamsCollection.map((team: any) => {
               <p>A challenge of a lifetime</p>
             </BannerMessage>
           </div>
-
           <div
             class="self-end pb-20 text-[3.5rem] font-extralight leading-[1.4] text-zu-light-banner-heading sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] lg:leading-[1.1] xl:text-[9.5rem] dark:text-zu-dark-banner-heading"
           >
@@ -55,32 +54,50 @@ const teams: any[] = teamsCollection.map((team: any) => {
             </div>
             <div slot="right" class=""> 
               
-              {teamsCollection.map((team) => (
-                <div class="mb-12 border-b pb-8">
-                  <h2 class="text-xl font-bold mb-4">{team.data.name}</h2>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-                    {membersCollection
-                      .filter((member) => team.data.members.includes(member.slug))
-                      .map((member) => (
-                        <div class="flex flex-col items-center">
-                          <Image
-                            src={member.data.image}
-                            alt={member.data.name}
-                            width={200}
-                            height={200}
-                            class="object-cover scale-90 hover:scale-100 hover:rotate-0 transition-transform duration-300"
-                            class:list={[
-                             ( Math.random() > 0.5
-                                ? "rotate-6"
-                                : "-rotate-3"), (Math.random() > 0.5 ? "scale-105" : "scale-100"),
-                            ]}
-                          />
-                          <p class="text-center text-lg font-bold mt-4">{member.data.name}</p>
+              {teamsCollection.map((team) => {
+                const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
+                return (
+                  <div class="mb-12 border-b pb-8 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-300 rounded-lg p-4">
+                    <div class="flex flex-wrap justify-between items-center mb-4">
+                      <h2 class="text-xl font-bold">
+                        <a href={`/teams/${team.slug}`} class="text-blue-600 dark:text-blue-400 hover:underline">
+                          {team.data.name}
+                        </a>
+                      </h2>
+                      <div class="flex space-x-2 mt-2 sm:mt-0">
+                        <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium">
+                          {totalPoints} total
                         </div>
-                      ))}
+                        <div class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full font-medium">
+                          +{team.data.goodPoints || 0}
+                        </div>
+                        <div class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full font-medium">
+                          -{team.data.badPoints || 0}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
+                      {membersCollection
+                        .filter((member) => team.data.members.includes(member.slug))
+                        .map((member) => (
+                          <div class="flex flex-col items-center">
+                            <img
+                              src={member.data.image}
+                              alt={member.data.name}
+                              width="200"
+                              height="200"
+                              class="object-cover scale-90 hover:scale-100 hover:rotate-0 transition-transform duration-300"
+                              style={{
+                                transform: `rotate(${Math.random() > 0.5 ? '6deg' : '-3deg'}) scale(${Math.random() > 0.5 ? '1.05' : '1'})`,
+                              }}
+                            />
+                            <p class="text-center text-lg font-bold mt-4">{member.data.name}</p>
+                          </div>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
             </div>
           </LayoutSticky>

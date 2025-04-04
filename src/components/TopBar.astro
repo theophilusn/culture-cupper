@@ -28,6 +28,36 @@ const currentPath = pathname.slice(1);
         </div>
         <div class="absolute right-0 top-8 lg:-right-[88px]">
         </div>
+        
+        <!-- Navigation Links -->
+        <nav class="flex justify-center py-8">
+          <ul class="flex space-x-8 text-lg font-medium">
+            <li>
+              <a 
+                href="/" 
+                class={`hover:text-blue-600 transition-colors duration-300 ${pathname === '/' ? 'text-blue-600 font-bold' : ''}`}
+              >
+                Home
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/games" 
+                class={`hover:text-blue-600 transition-colors duration-300 ${pathname.startsWith('/games') ? 'text-blue-600 font-bold' : ''}`}
+              >
+                Games
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/teams" 
+                class={`hover:text-blue-600 transition-colors duration-300 ${pathname.startsWith('/teams') ? 'text-blue-600 font-bold' : ''}`}
+              >
+                Teams
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
