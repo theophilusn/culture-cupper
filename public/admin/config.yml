@@ -58,15 +58,26 @@ collections:
         multiple: true
         required: true
         hint: "Select team members from the members collection"
-      - label: "Points"
-        name: "points"
+      - label: "Good Points"
+        name: "goodPoints"
         widget: "number"
         default: 0
         value_type: "int"
-        min: -50
+        min: 0
         max: 1000
         step: 1
-        disabled: true
+        required: true
+        hint: "Positive points earned by the team"
+      - label: "Bad Points"
+        name: "badPoints"
+        widget: "number"
+        default: 0
+        value_type: "int"
+        min: 0
+        max: 1000
+        step: 1
+        required: true
+        hint: "Negative points earned by the team"
 
   - label: "Members"
     name: "members"
@@ -84,16 +95,174 @@ collections:
         widget: "string"
         required: true
         hint: "The name of the member"
+      - label: "Position"
+        name: "position"
+        widget: "string"
+        required: true
+        hint: "The member's position or role"
       - label: "Image"
         name: "image"
         widget: "string"
         required: true
-        hint: "The team members image path"
+        hint: "The team member's image path"
+      - label: "Description"
+        name: "description"
+        widget: "text"
+        required: false
+        hint: "Description of the team member"
+      - label: "Is Leadership"
+        name: "isLeadership"
+        widget: "boolean"
+        default: false
+        required: false
+        hint: "Whether this member is part of leadership"
+      - label: "Order"
+        name: "order"
+        widget: "number"
+        default: 99
+        value_type: "int"
+        min: 1
+        max: 999
+        step: 1
+        required: false
+        hint: "Sorting order for display"
+
+  - label: "Events"
+    name: "events"
+    label_singular: "Event"
+    description: "Event with team member participants and point logs"
+    delete: false
+    folder: "src/content/events"
+    create: true
+    identifier_field: name
+    preview_path: "events/{{slug}}"
+    sortable_fields: ["date"]
+    fields:
+      - label: "Name"
+        name: "name"
+        widget: "string"
+        required: true
+        hint: "The name of the event"
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: true
+        hint: "The date of the event"
+      - label: "Description"
+        name: "description"
+        widget: "text"
+        required: false
+        hint: "Description of the event"
+      - label: "Participants"
+        name: "participants"
+        widget: "relation"
+        collection: "members"
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        multiple: true
+        required: true
+        hint: "Select event participants from the members collection"
+      - label: "Points Logs"
+        name: "pointsLogs"
+        widget: "list"
+        summary: "{{fields.team}} - {{fields.points}} points ({{fields.isGoodPoints}})"
+        required: false
+        hint: "Points awarded or deducted during this event"
+        fields:
+          - label: "Points"
+            name: "points"
+            widget: "number"
+            default: 0
+            value_type: "int"
+            min: 0
+            max: 1000
+            step: 1
+            required: true
+            hint: "The number of points to add or subtract"
+          - label: "Reason"
+            name: "reason"
+            widget: "string"
+            required: true
+            hint: "The reason for the points"
+          - label: "Team"
+            name: "team"
+            widget: "relation"
+            collection: "teams"
+            search_fields: ["name"]
+            value_field: "{{slug}}"
+            display_fields: ["name"]
+            required: true
+            hint: "Select the team that gets these points"
+          - label: "Is Good Points"
+            name: "isGoodPoints"
+            widget: "boolean"
+            default: true
+            required: true
+            hint: "Whether these are good points (true) or bad points (false)"
+
+  - label: "Games"
+    name: "games"
+    label_singular: "Game"
+    description: "Game competition between teams"
+    delete: false
+    folder: "src/content/games"
+    create: true
+    identifier_field: name
+    preview_path: "games/{{slug}}"
+    sortable_fields: ["date"]
+    fields:
+      - label: "Name"
+        name: "name"
+        widget: "string"
+        required: true
+        hint: "The name of the game"
+      - label: "Description"
+        name: "description"
+        widget: "text"
+        required: true
+        hint: "Description of the game"
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: false
+        hint: "The date of the game"
+      - label: "Winner"
+        name: "winner"
+        widget: "string"
+        required: false
+        hint: "The winning team's name"
+      - label: "Participants"
+        name: "participants"
+        widget: "relation"
+        collection: "teams"
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        multiple: true
+        required: false
+        hint: "Select participating teams"
+      - label: "Points"
+        name: "points"
+        widget: "number"
+        default: 0
+        value_type: "int"
+        min: 0
+        max: 1000
+        step: 1
+        required: false
+        hint: "Points awarded to the winner"
 
   - label: "Points Log"
     name: "points_log"
     label_singular: "Points Log"
-    description: "Log of points"
+    description: "Legacy points logging system"
     delete: false
     folder: "src/content/points-log"
     create: true
@@ -140,3 +309,9 @@ collections:
         widget: "string"
         required: true
         hint: "The reason for the points log"
+      - label: "Is Good Points"
+        name: "isGoodPoints"
+        widget: "boolean"
+        default: true
+        required: true
+        hint: "Whether these are good points (true) or bad points (false)"

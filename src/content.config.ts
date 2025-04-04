@@ -51,4 +51,25 @@ export const collections = {
         points: z.number().optional(),
       }),
   }),
+  events: defineCollection({
+    loader: glob({
+      pattern: "**/[^_]*.{md,mdx}",
+      base: "./src/content/events",
+    }),
+    schema: () =>
+      z.object({
+        name: z.string(),
+        date: z.string(),
+        description: z.string().optional(),
+        participants: z.array(reference("members")),
+        pointsLogs: z.array(
+          z.object({
+            points: z.number(),
+            reason: z.string(),
+            team: reference("teams"),
+            isGoodPoints: z.boolean().default(true),
+          })
+        ).optional(),
+      }),
+  }),
 };

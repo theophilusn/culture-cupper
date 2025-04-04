@@ -42,6 +42,14 @@ const currentPath = pathname.slice(1);
             </li>
             <li>
               <a 
+                href="/events" 
+                class={`hover:text-blue-600 transition-colors duration-300 ${pathname.startsWith('/events') ? 'text-blue-600 font-bold' : ''}`}
+              >
+                Events
+              </a>
+            </li>
+            <li>
+              <a 
                 href="/games" 
                 class={`hover:text-blue-600 transition-colors duration-300 ${pathname.startsWith('/games') ? 'text-blue-600 font-bold' : ''}`}
               >
