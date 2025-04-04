@@ -6,20 +6,64 @@ import Footer from "@/components/Footer.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import Prose from "@/components/Prose.astro";
 import { getCollection } from "astro:content";
-import ColumnChart from "@/components/Chart.jsx";
-import { GuessZuBracket, SFBracket } from "@/components/Bracket";
+import BarChart from "@/components/BarChart.astro";
+import { calculateTeamPoints } from "@/utils/pointsCalculator";
+import TournamentBracket from "@/components/TournamentBracket.astro";
+import { formatTournamentData } from "@/utils/tournamentFormatter";
 
 const teamsCollection = await getCollection("teams");
 const membersCollection = await getCollection("members");
 const gamesCollection = await getCollection("games");
+const eventsCollection = await getCollection("events");
+const tournamentsCollection = await getCollection("tournaments");
 
-// Calculate total points (good - bad) for each team
-const teams: any[] = teamsCollection.map((team: any) => {
-  return (team.data.goodPoints || 0) - (team.data.badPoints || 0);
-});
+// Get tournaments to display on homepage
+const homepageTournaments = tournamentsCollection.filter(
+  (tournament) => tournament.data.showOnHomepage
+);
+
+// Format tournament data for the TournamentBracket component
+const formattedTournaments = await Promise.all(
+  homepageTournaments.map(async (tournament) => {
+    return await formatTournamentData(tournament, membersCollection);
+  })
+);
+
+// Calculate total points for each team using the pointsCalculator
+const teamsWithPoints = await Promise.all(
+  teamsCollection.map(async (team) => {
+    const pointsData = await calculateTeamPoints(
+      team.slug,
+      teamsCollection,
+      gamesCollection,
+      eventsCollection
+    );
+    
+    return {
+      name: team.data.name,
+      points: pointsData.totalPoints,
+      slug: team.slug
+    };
+  })
+);
+
+// Sort teams by total points (highest first)
+const sortedTeams = teamsWithPoints.sort((a, b) => b.points - a.points);
+
+// Format team data for the bar chart
+const barChartData = sortedTeams.map(team => ({
+  name: team.name,
+  points: team.points,
+  // Assign colors based on team name for consistency
+  color: 
+    team.slug === "zu_rassic_park" ? "#1A56DB" : 
+    team.slug === "the_standard" ? "#16A34A" : 
+    team.slug === "karens_favourites" ? "#CA8A04" : 
+    team.slug === "ms_paint_2" ? "#DC2626" : "#6366F1"
+}));
 ---
 
-<Layout title="Culture Cup" description="A battle like no other">
+<Layout title="Culture Cup" description="The Zuluru Culture Cup">
   <TopBar />
   <main>
     <section
@@ -30,13 +74,14 @@ const teams: any[] = teamsCollection.map((team: any) => {
         <div class="grid h-[calc(100svh_-_3rem)] min-h-[600px]">
           <div class="self-start">
             <BannerMessage>
-              <p>A challenge of a lifetime</p>
+              <p>Welcome to the</p>
             </BannerMessage>
           </div>
           <div
             class="self-end pb-20 text-[3.5rem] font-extralight leading-[1.4] text-zu-light-banner-heading sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] lg:leading-[1.1] xl:text-[9.5rem] dark:text-zu-dark-banner-heading"
           >
-            Culture Cup<br />
+            Culture<br />
+            Cup
           </div>
         </div>
       </div>
@@ -52,30 +97,20 @@ const teams: any[] = teamsCollection.map((team: any) => {
                 / Teams
               </h1>
             </div>
-            <div slot="right" class=""> 
-              
+            <div slot="right" class="mt-2.5">
               {teamsCollection.map((team) => {
-                const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
+                const teamMembers = membersCollection.filter(
+                  (member) => team.data.members.includes(member.slug)
+                );
                 return (
-                  <div class="mb-12 border-b pb-8 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-300 rounded-lg p-4">
-                    <div class="flex flex-wrap justify-between items-center mb-4">
-                      <h2 class="text-xl font-bold">
-                        <a href={`/teams/${team.slug}`} class="text-blue-600 dark:text-blue-400 hover:underline">
-                          {team.data.name}
-                        </a>
-                      </h2>
-                      <div class="flex space-x-2 mt-2 sm:mt-0">
-                        <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium">
-                          {totalPoints} total
-                        </div>
-                        <div class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full font-medium">
-                          +{team.data.goodPoints || 0}
-                        </div>
-                        <div class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full font-medium">
-                          -{team.data.badPoints || 0}
-                        </div>
-                      </div>
-                    </div>
+                  <div class="mb-16">
+                    <a
+                      href={`/teams/${team.slug}`}
+                      class="flex justify-between items-center mb-8 hover:text-blue-600"
+                    >
+                      <h2 class="text-3xl font-bold">{team.data.name}</h2>
+                      <span class="text-xl">View Team →</span>
+                    </a>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
                       {membersCollection
                         .filter((member) => team.data.members.includes(member.slug))
@@ -116,48 +151,32 @@ const teams: any[] = teamsCollection.map((team: any) => {
                 How things are breaking down:
               </h2>
 
-              <ColumnChart zurassicPoints={teams[3]} msPoints={teams[1]} karensFavPoints={teams[0]} standardPoints={teams[2]} client:only="react" />
+              <BarChart teamData={barChartData} title="Team Points Leaderboard" height={350} />
             </div>
           </LayoutSticky>
         </Prose>
       </div>
     </section>
-    <section>
-      <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
-        <Prose>
-          <LayoutSticky>
-            <div slot="left" class="h-full">
-              <h1
-                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
-              >
-                / Street Fighter II
-              </h1>
-            </div>
-            <div slot="right" class="mt-2.5">
-              <SFBracket client:only="react" />
-            </div>
-          </LayoutSticky>
-        </Prose>
-      </div>
-    </section>
-    <section>
-      <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
-        <Prose>
-          <LayoutSticky>
-            <div slot="left" class="h-full">
-              <h1
-                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
-              >
-                / Guess zu
-              </h1>
-            </div>
-            <div slot="right" class="mt-2.5">
-              <GuessZuBracket client:only="react" />
-            </div>
-          </LayoutSticky>
-        </Prose>
-      </div>
-    </section>
+    {formattedTournaments.map((tournament) => (
+      <section>
+        <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
+          <Prose>
+            <LayoutSticky>
+              <div slot="left" class="h-full">
+                <h1
+                  class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
+                >
+                  / {tournament.name}
+                </h1>
+              </div>
+              <div slot="right" class="mt-2.5">
+                <TournamentBracket tournament={tournament} />
+              </div>
+            </LayoutSticky>
+          </Prose>
+        </div>
+      </section>
+    ))}
   </main>
   <Footer />
 </Layout>

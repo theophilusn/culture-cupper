@@ -26,13 +26,10 @@ export const collections = {
       return z.object({
         name: z.string(),
         members: z.array(reference("members")),
-        goodPoints: z.number().default(0),
-        badPoints: z.number().default(0),
-      }).transform(data => {
-        return {
-          ...data,
-          points: data.goodPoints - data.badPoints
-        };
+        manualGoodPoints: z.number().default(0),
+        manualBadPoints: z.number().default(0),
+        goodPoints: z.number().optional(),
+        badPoints: z.number().optional(),
       });
     },
   }),
@@ -49,6 +46,32 @@ export const collections = {
         winner: z.string().optional(),
         participants: z.array(reference("teams")).optional(),
         points: z.number().optional(),
+      }),
+  }),
+  tournaments: defineCollection({
+    loader: glob({
+      pattern: "**/[^_]*.{md,mdx}",
+      base: "./src/content/tournaments",
+    }),
+    schema: () =>
+      z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        date: z.string().optional(),
+        winner: reference("members").optional(),
+        matches: z.array(
+          z.object({
+            id: z.string(),
+            round: z.number().min(1).max(3),
+            participants: z.array(
+              z.object({
+                member: reference("members"),
+                isWinner: z.boolean().default(false),
+              })
+            ).max(2),
+          })
+        ),
+        showOnHomepage: z.boolean().default(true),
       }),
   }),
   events: defineCollection({

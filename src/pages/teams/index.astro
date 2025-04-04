@@ -6,15 +6,48 @@ import Footer from "@/components/Footer.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import Prose from "@/components/Prose.astro";
 import { getCollection } from "astro:content";
+import { calculateTeamPoints } from "@/utils/pointsCalculator";
 
 const teamsCollection = await getCollection("teams");
 const membersCollection = await getCollection("members");
+const gamesCollection = await getCollection("games");
+const eventsCollection = await getCollection("events");
+
+// Calculate points for all teams and sort by total points
+const teamsWithPoints = await Promise.all(
+  teamsCollection.map(async (team) => {
+    const pointsData = await calculateTeamPoints(
+      team.slug,
+      teamsCollection,
+      gamesCollection,
+      eventsCollection
+    );
+    return {
+      team,
+      points: pointsData
+    };
+  })
+);
 
 // Sort teams by total points (highest first)
-const sortedTeams = [...teamsCollection].sort((a, b) => {
-  const aTotal = (a.data.goodPoints || 0) - (a.data.badPoints || 0);
-  const bTotal = (b.data.goodPoints || 0) - (b.data.badPoints || 0);
-  return bTotal - aTotal;
+const sortedTeams = teamsWithPoints.sort((a, b) => 
+  b.points.totalPoints - a.points.totalPoints
+);
+
+// Add rank field that handles ties properly
+let currentRank = 1;
+let prevPoints = -1;
+const rankedTeams = sortedTeams.map((teamData, index) => {
+  // If this team has fewer points than the previous team, increment the rank
+  if (index > 0 && teamData.points.totalPoints < prevPoints) {
+    currentRank = index + 1;
+  }
+  prevPoints = teamData.points.totalPoints;
+  
+  return {
+    ...teamData,
+    rank: currentRank
+  };
 });
 ---
 
@@ -52,11 +85,10 @@ const sortedTeams = [...teamsCollection].sort((a, b) => {
             </div>
             <div slot="right" class="mt-2.5">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {sortedTeams.map((team, index) => {
+                {rankedTeams.map(({team, points, rank}) => {
                   const teamMembers = membersCollection.filter(member => 
                     team.data.members.includes(member.slug)
                   );
-                  const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
                   
                   return (
                     <a href={`/teams/${team.slug}`} class="block group">
@@ -65,23 +97,23 @@ const sortedTeams = [...teamsCollection].sort((a, b) => {
                           <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-bold group-hover:text-blue-600 transition-colors">{team.data.name}</h2>
                             <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 px-3 py-1 rounded-full">
-                              {totalPoints} points
+                              {points.totalPoints} points
                             </div>
                           </div>
                           
                           <div class="flex items-center mb-4">
                             <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold mr-3">
-                              #{index + 1}
+                              #{rank}
                             </div>
                             <span class="text-lg">{teamMembers.length} members</span>
                           </div>
                           
                           <div class="flex justify-between mb-4">
                             <div class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full font-medium">
-                              +{team.data.goodPoints || 0} good
+                              +{points.goodPoints} good
                             </div>
                             <div class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full font-medium">
-                              -{team.data.badPoints || 0} bad
+                              -{points.badPoints} bad
                             </div>
                           </div>
                           

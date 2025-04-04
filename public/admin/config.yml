@@ -58,8 +58,8 @@ collections:
         multiple: true
         required: true
         hint: "Select team members from the members collection"
-      - label: "Good Points"
-        name: "goodPoints"
+      - label: "Manual Good Points"
+        name: "manualGoodPoints"
         widget: "number"
         default: 0
         value_type: "int"
@@ -67,9 +67,9 @@ collections:
         max: 1000
         step: 1
         required: true
-        hint: "Positive points earned by the team"
-      - label: "Bad Points"
-        name: "badPoints"
+        hint: "Manual adjustment to good points (added to points from games and events)"
+      - label: "Manual Bad Points"
+        name: "manualBadPoints"
         widget: "number"
         default: 0
         value_type: "int"
@@ -77,7 +77,7 @@ collections:
         max: 1000
         step: 1
         required: true
-        hint: "Negative points earned by the team"
+        hint: "Manual adjustment to bad points (added to points from games and events)"
 
   - label: "Members"
     name: "members"
@@ -126,6 +126,94 @@ collections:
         step: 1
         required: false
         hint: "Sorting order for display"
+
+  - label: "Tournaments"
+    name: "tournaments"
+    label_singular: "Tournament"
+    description: "Tournament brackets for member competitions"
+    delete: false
+    folder: "src/content/tournaments"
+    create: true
+    identifier_field: name
+    preview_path: "tournaments/{{slug}}"
+    sortable_fields: ["date"]
+    fields:
+      - label: "Name"
+        name: "name"
+        widget: "string"
+        required: true
+        hint: "The name of the tournament"
+      - label: "Description"
+        name: "description"
+        widget: "text"
+        required: false
+        hint: "Description of the tournament"
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+        required: false
+        hint: "The date of the tournament"
+      - label: "Winner"
+        name: "winner"
+        widget: "relation"
+        collection: "members"
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        required: false
+        hint: "The tournament winner"
+      - label: "Show on Homepage"
+        name: "showOnHomepage"
+        widget: "boolean"
+        default: true
+        required: false
+        hint: "Whether to show this tournament on the homepage"
+      - label: "Matches"
+        name: "matches"
+        widget: "list"
+        summary: "Round {{fields.round}} - Match {{fields.id}}"
+        hint: "Tournament matches"
+        fields:
+          - label: "Match ID"
+            name: "id"
+            widget: "string"
+            required: true
+            hint: "Unique identifier for the match"
+          - label: "Round"
+            name: "round"
+            widget: "number"
+            default: 1
+            value_type: "int"
+            min: 1
+            max: 3
+            step: 1
+            required: true
+            hint: "Tournament round (1: first round, 2: semifinals, 3: finals)"
+          - label: "Participants"
+            name: "participants"
+            widget: "list"
+            summary: "{{fields.member}} ({{fields.isWinner}})"
+            hint: "Match participants (max 2)"
+            max: 2
+            fields:
+              - label: "Member"
+                name: "member"
+                widget: "relation"
+                collection: "members"
+                search_fields: ["name"]
+                value_field: "{{slug}}"
+                display_fields: ["name"]
+                required: true
+                hint: "Select participant from members"
+              - label: "Is Winner"
+                name: "isWinner"
+                widget: "boolean"
+                default: false
+                required: true
+                hint: "Whether this participant won the match"
 
   - label: "Events"
     name: "events"

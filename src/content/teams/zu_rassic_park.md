@@ -11,7 +11,7 @@ members:
   - gregor-butina
   - haley-wiberg
   - jasmine-pawliw
-goodPoints: 150
-badPoints: 24
+manualGoodPoints: 75
+manualBadPoints: 10
 ---
 

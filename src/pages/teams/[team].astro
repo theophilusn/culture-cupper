@@ -6,30 +6,96 @@ import Footer from "@/components/Footer.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import Prose from "@/components/Prose.astro";
 import { getCollection } from "astro:content";
+import { calculateTeamPoints } from "@/utils/pointsCalculator";
+import type { CollectionEntry } from "astro:content";
+
+// Define types for the event point logs to address TypeScript errors
+interface PointLog {
+  points: number;
+  reason: string;
+  team: string;
+  isGoodPoints: boolean;
+}
+
+// Define type for team data with rank
+interface TeamWithPoints {
+  team: CollectionEntry<'teams'>;
+  pointsData: {
+    goodPoints: number;
+    badPoints: number;
+    totalPoints: number;
+  };
+  rank?: number;
+}
 
 export async function getStaticPaths() {
   const teamsCollection = await getCollection("teams");
   const gamesCollection = await getCollection("games");
+  const eventsCollection = await getCollection("events");
   
-  return teamsCollection.map(team => {
+  // Calculate points for all teams to determine ranks
+  const teamsWithPoints: TeamWithPoints[] = await Promise.all(
+    teamsCollection.map(async (team) => {
+      const pointsData = await calculateTeamPoints(
+        team.slug,
+        teamsCollection,
+        gamesCollection,
+        eventsCollection
+      );
+      return {
+        team,
+        pointsData
+      };
+    })
+  );
+  
+  // Sort teams by total points and assign ranks
+  const sortedTeams = teamsWithPoints.sort((a, b) => 
+    b.pointsData.totalPoints - a.pointsData.totalPoints
+  );
+  
+  // Handle ties properly in ranking
+  let currentRank = 1;
+  let prevPoints = -1;
+  sortedTeams.forEach((teamData, index) => {
+    if (index > 0 && teamData.pointsData.totalPoints < prevPoints) {
+      currentRank = index + 1;
+    }
+    teamData.rank = currentRank;
+    prevPoints = teamData.pointsData.totalPoints;
+  });
+  
+  return Promise.all(teamsCollection.map(async team => {
     // Find all games this team participated in
     const teamGames = gamesCollection.filter(game => 
       game.data.participants?.includes(team.slug)
     );
     
-    // Calculate team's total points from games they won
-    const gamePoints = teamGames
-      .filter(game => game.data.winner === team.data.name)
-      .reduce((sum, game) => sum + (game.data.points || 0), 0);
+    // Calculate team's points from all sources
+    const pointsData = await calculateTeamPoints(
+      team.slug, 
+      teamsCollection, 
+      gamesCollection, 
+      eventsCollection
+    );
+    
+    // Find team's rank from the sorted array
+    const teamWithRank = sortedTeams.find(t => t.team.slug === team.slug);
+    const rank = teamWithRank?.rank || 0;
     
     return {
       params: { team: team.slug },
-      props: { team, teamGames }
+      props: { 
+        team, 
+        teamGames,
+        pointsData,
+        rank
+      }
     };
-  });
+  }));
 }
 
-const { team, teamGames } = Astro.props;
+const { team, teamGames, pointsData, rank } = Astro.props;
 const membersCollection = await getCollection("members");
 const eventsCollection = await getCollection("events");
 
@@ -46,11 +112,35 @@ const teamEvents = eventsCollection.filter(event =>
 
 // Find events where this team received points
 const teamPointEvents = eventsCollection.filter(event => 
-  event.data.pointsLogs?.some((log: { team: string }) => log.team === team.slug)
+  event.data.pointsLogs?.some((log: PointLog) => log.team === team.slug)
 );
 
-// Calculate total points (should be goodPoints - badPoints)
-const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
+// Destructure the calculated points
+const { goodPoints, badPoints, totalPoints } = pointsData;
+
+// Get points breakdown by source
+const manualGoodPoints = team.data.manualGoodPoints || team.data.goodPoints || 0;
+const manualBadPoints = team.data.manualBadPoints || team.data.badPoints || 0;
+
+// Calculate game points
+const gamePoints = teamGames
+  .filter(game => game.data.winner === team.data.name)
+  .reduce((sum, game) => sum + (game.data.points || 0), 0);
+
+// Calculate event points
+const eventGoodPoints = teamPointEvents.reduce((sum, event) => {
+  const teamLogs = event.data.pointsLogs?.filter((log: PointLog) => 
+    log.team === team.slug && log.isGoodPoints
+  ) || [];
+  return sum + teamLogs.reduce((total: number, log: PointLog) => total + log.points, 0);
+}, 0);
+
+const eventBadPoints = teamPointEvents.reduce((sum, event) => {
+  const teamLogs = event.data.pointsLogs?.filter((log: PointLog) => 
+    log.team === team.slug && !log.isGoodPoints
+  ) || [];
+  return sum + teamLogs.reduce((total: number, log: PointLog) => total + log.points, 0);
+}, 0);
 ---
 
 <Layout title={`${team.data.name} | Culture Cup`} description={`${team.data.name} team page`}>
@@ -99,18 +189,63 @@ const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                 <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300 border-2 border-green-200 dark:border-green-800">
                   <h3 class="text-xl font-bold mb-2 text-green-700 dark:text-green-400">Good Points</h3>
-                  <p class="text-3xl font-bold text-green-600 dark:text-green-300">+{team.data.goodPoints || 0}</p>
+                  <p class="text-3xl font-bold text-green-600 dark:text-green-300">+{goodPoints}</p>
                 </div>
                 <div class="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300 border-2 border-red-200 dark:border-red-800">
                   <h3 class="text-xl font-bold mb-2 text-red-700 dark:text-red-400">Bad Points</h3>
-                  <p class="text-3xl font-bold text-red-600 dark:text-red-300">-{team.data.badPoints || 0}</p>
+                  <p class="text-3xl font-bold text-red-600 dark:text-red-300">-{badPoints}</p>
+                </div>
+              </div>
+              
+              <!-- Points Sources Breakdown -->
+              <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-10">
+                <h3 class="text-xl font-bold mb-4">Points Breakdown by Source</h3>
+                <div class="space-y-4">
+                  <div class="border-b pb-3">
+                    <div class="flex justify-between mb-2">
+                      <span class="font-medium">Manual Adjustments</span>
+                      <span class="font-bold">{manualGoodPoints - manualBadPoints} points</span>
+                    </div>
+                    <div class="flex justify-end space-x-4 text-sm">
+                      <span class="text-green-600 dark:text-green-400">+{manualGoodPoints} good</span>
+                      <span class="text-red-600 dark:text-red-400">-{manualBadPoints} bad</span>
+                    </div>
+                  </div>
+                  
+                  <div class="border-b pb-3">
+                    <div class="flex justify-between mb-2">
+                      <span class="font-medium">Games</span>
+                      <span class="font-bold">{gamePoints} points</span>
+                    </div>
+                    <div class="flex justify-end text-sm">
+                      <span class="text-green-600 dark:text-green-400">+{gamePoints} good</span>
+                    </div>
+                  </div>
+                  
+                  <div class="border-b pb-3">
+                    <div class="flex justify-between mb-2">
+                      <span class="font-medium">Events</span>
+                      <span class="font-bold">{eventGoodPoints - eventBadPoints} points</span>
+                    </div>
+                    <div class="flex justify-end space-x-4 text-sm">
+                      <span class="text-green-600 dark:text-green-400">+{eventGoodPoints} good</span>
+                      <span class="text-red-600 dark:text-red-400">-{eventBadPoints} bad</span>
+                    </div>
+                  </div>
+                  
+                  <div class="pt-2">
+                    <div class="flex justify-between font-bold">
+                      <span>Total</span>
+                      <span>{totalPoints} points</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                 <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300">
                   <h3 class="text-xl font-bold mb-2">Team Rank</h3>
-                  <p class="text-3xl font-bold">#1</p>
+                  <p class="text-3xl font-bold">#{rank}</p>
                 </div>
                 <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300">
                   <h3 class="text-xl font-bold mb-2">Team Size</h3>
@@ -124,9 +259,9 @@ const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
                   <div class="grid grid-cols-1 gap-4">
                     {teamPointEvents.map(event => {
                       // Get only the points logs for this team
-                      const teamLogs = event.data.pointsLogs?.filter((log: { team: string }) => log.team === team.slug) || [];
-                      const goodPoints = teamLogs.filter((log: { isGoodPoints: boolean }) => log.isGoodPoints).reduce((sum: number, log: { points: number } ) => sum + log.points, 0);
-                      const badPoints = teamLogs.filter((log: { isGoodPoints: boolean }) => !log.isGoodPoints).reduce((sum: number, log: { points: number } ) => sum + log.points, 0);
+                      const teamLogs = event.data.pointsLogs?.filter((log: PointLog) => log.team === team.slug) || [];
+                      const goodPoints = teamLogs.filter((log: PointLog) => log.isGoodPoints).reduce((sum: number, log: PointLog) => sum + log.points, 0);
+                      const badPoints = teamLogs.filter((log: PointLog) => !log.isGoodPoints).reduce((sum: number, log: PointLog) => sum + log.points, 0);
                       const netPoints = goodPoints - badPoints;
                       
                       return (
@@ -182,7 +317,7 @@ const totalPoints = (team.data.goodPoints || 0) - (team.data.badPoints || 0);
                       <div class="flex justify-between">
                         <span>{game.data.date}</span>
                         <span class={`font-bold ${game.data.winner === team.data.name ? "text-green-500" : "text-gray-500"}`}>
-                          {game.data.winner === team.data.name ? "Winner! 🏆" : `Winner: ${game.data.winner}`}
+                          {game.data.winner === team.data.name ? `Winner! 🏆 +${game.data.points || 0} points` : `Winner: ${game.data.winner}`}
                         </span>
                       </div>
                     </div>

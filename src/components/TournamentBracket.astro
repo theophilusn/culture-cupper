@@ -1,0 +1,239 @@
+---
+interface Participant {
+  id: string;
+  name: string;
+  image?: string;
+  isWinner: boolean;
+}
+
+interface Match {
+  id: string;
+  round: 1 | 2 | 3; // 1: quarter, 2: semi, 3: final
+  participants: Participant[];
+}
+
+interface Props {
+  tournament: {
+    name: string;
+    matches: Match[];
+  };
+}
+
+const { tournament } = Astro.props;
+
+// Group matches by round
+const matchesByRound = {
+  1: tournament.matches.filter(match => match.round === 1),
+  2: tournament.matches.filter(match => match.round === 2),
+  3: tournament.matches.filter(match => match.round === 3)
+};
+---
+
+<div class="tournament-bracket">
+  <h3 class="text-xl font-bold mb-6">{tournament.name}</h3>
+  
+  <div class="bracket-container">
+    <!-- Round 1: Quarter Finals -->
+    <div class="round round-1">
+      <h4 class="text-lg font-medium mb-4">First Round</h4>
+      <div class="matches">
+        {matchesByRound[1].map((match) => (
+          <div class="match">
+            <div class="match-participants">
+              {match.participants.map((participant) => (
+                <div 
+                  class:list={[
+                    "participant", 
+                    { winner: participant.isWinner }
+                  ]}
+                >
+                  {participant.image && (
+                    <div class="participant-image">
+                      <img src={participant.image} alt={participant.name} width="40" height="40" />
+                    </div>
+                  )}
+                  <div class="participant-name">{participant.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    
+    <!-- Round 2: Semi Finals -->
+    <div class="round round-2">
+      <h4 class="text-lg font-medium mb-4">Semi Finals</h4>
+      <div class="matches">
+        {matchesByRound[2].map((match) => (
+          <div class="match">
+            <div class="match-participants">
+              {match.participants.map((participant) => (
+                <div 
+                  class:list={[
+                    "participant", 
+                    { winner: participant.isWinner }
+                  ]}
+                >
+                  {participant.image && (
+                    <div class="participant-image">
+                      <img src={participant.image} alt={participant.name} width="40" height="40" />
+                    </div>
+                  )}
+                  <div class="participant-name">{participant.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    
+    <!-- Round 3: Finals -->
+    <div class="round round-3">
+      <h4 class="text-lg font-medium mb-4">Finals</h4>
+      <div class="matches">
+        {matchesByRound[3].map((match) => (
+          <div class="match">
+            <div class="match-participants">
+              {match.participants.map((participant) => (
+                <div 
+                  class:list={[
+                    "participant", 
+                    { winner: participant.isWinner }
+                  ]}
+                >
+                  {participant.image && (
+                    <div class="participant-image">
+                      <img src={participant.image} alt={participant.name} width="40" height="40" />
+                    </div>
+                  )}
+                  <div class="participant-name">{participant.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tournament-bracket {
+    width: 100%;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  
+  .bracket-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    min-width: 650px;
+  }
+  
+  .round {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .matches {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .round-1 .matches {
+    gap: 1rem;
+  }
+  
+  .round-2 .matches {
+    margin-top: 1.5rem;
+  }
+  
+  .round-3 .matches {
+    margin-top: 3.5rem;
+  }
+  
+  .match {
+    background-color: var(--zu-light-secondary, #f3f4f6);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    position: relative;
+  }
+  
+  .match::before,
+  .match::after {
+    content: '';
+    position: absolute;
+    background-color: #cbd5e1;
+  }
+  
+  .round-1 .match::after {
+    height: 1px;
+    width: 1rem;
+    top: 50%;
+    right: -1rem;
+  }
+  
+  .round-2 .match::before {
+    height: 1px;
+    width: 1rem;
+    top: 50%;
+    left: -1rem;
+  }
+  
+  .round-2 .match::after {
+    height: 1px;
+    width: 1rem;
+    top: 50%;
+    right: -1rem;
+  }
+  
+  .round-3 .match::before {
+    height: 1px;
+    width: 1rem;
+    top: 50%;
+    left: -1rem;
+  }
+  
+  .match-participants {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .participant {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .participant.winner {
+    background-color: #e0f2fe;
+    font-weight: 600;
+  }
+  
+  .participant-image img {
+    border-radius: 50%;
+    object-fit: cover;
+    width: 30px;
+    height: 30px;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .match {
+      background-color: var(--zu-dark-secondary, #374151);
+    }
+    
+    .participant.winner {
+      background-color: #0c4a6e;
+    }
+  }
+</style> 
