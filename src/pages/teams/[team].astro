@@ -1,7 +1,5 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import TopBar from "@/components/TopBar.astro";
-import BannerMessage from "@/components/BannerMessage.astro";
 import Footer from "@/components/Footer.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import Prose from "@/components/Prose.astro";
@@ -19,7 +17,7 @@ interface PointLog {
 
 // Define type for team data with rank
 interface TeamWithPoints {
-  team: CollectionEntry<'teams'>;
+  team: CollectionEntry<"teams">;
   pointsData: {
     goodPoints: number;
     badPoints: number;
@@ -32,7 +30,7 @@ export async function getStaticPaths() {
   const teamsCollection = await getCollection("teams");
   const gamesCollection = await getCollection("games");
   const eventsCollection = await getCollection("events");
-  
+
   // Calculate points for all teams to determine ranks
   const teamsWithPoints: TeamWithPoints[] = await Promise.all(
     teamsCollection.map(async (team) => {
@@ -40,20 +38,20 @@ export async function getStaticPaths() {
         team.slug,
         teamsCollection,
         gamesCollection,
-        eventsCollection
+        eventsCollection,
       );
       return {
         team,
-        pointsData
+        pointsData,
       };
-    })
+    }),
   );
-  
+
   // Sort teams by total points and assign ranks
-  const sortedTeams = teamsWithPoints.sort((a, b) => 
-    b.pointsData.totalPoints - a.pointsData.totalPoints
+  const sortedTeams = teamsWithPoints.sort(
+    (a, b) => b.pointsData.totalPoints - a.pointsData.totalPoints,
   );
-  
+
   // Handle ties properly in ranking
   let currentRank = 1;
   let prevPoints = -1;
@@ -64,87 +62,100 @@ export async function getStaticPaths() {
     teamData.rank = currentRank;
     prevPoints = teamData.pointsData.totalPoints;
   });
-  
-  return Promise.all(teamsCollection.map(async team => {
-    // Find all games this team participated in
-    const teamGames = gamesCollection.filter(game => 
-      game.data.participants?.includes(team.slug)
-    );
-    
-    // Calculate team's points from all sources
-    const pointsData = await calculateTeamPoints(
-      team.slug, 
-      teamsCollection, 
-      gamesCollection, 
-      eventsCollection
-    );
-    
-    // Find team's rank from the sorted array
-    const teamWithRank = sortedTeams.find(t => t.team.slug === team.slug);
-    const rank = teamWithRank?.rank || 0;
-    
-    return {
-      params: { team: team.slug },
-      props: { 
-        team, 
-        teamGames,
-        pointsData,
-        rank
-      }
-    };
-  }));
+
+  return Promise.all(
+    teamsCollection.map(async (team) => {
+      // Find all games this team participated in
+      const teamGames = gamesCollection.filter((game) =>
+        game.data.participants?.includes(team.slug),
+      );
+
+      // Calculate team's points from all sources
+      const pointsData = await calculateTeamPoints(
+        team.slug,
+        teamsCollection,
+        gamesCollection,
+        eventsCollection,
+      );
+
+      // Find team's rank from the sorted array
+      const teamWithRank = sortedTeams.find((t) => t.team.slug === team.slug);
+      const rank = teamWithRank?.rank || 0;
+
+      return {
+        params: { team: team.slug },
+        props: {
+          team,
+          teamGames,
+          pointsData,
+          rank,
+        },
+      };
+    }),
+  );
 }
 
 const { team, teamGames, pointsData, rank } = Astro.props;
 const membersCollection = await getCollection("members");
 const eventsCollection = await getCollection("events");
 
-const teamMembers = membersCollection.filter(member => 
-  team.data.members.includes(member.slug)
+const teamMembers = membersCollection.filter((member) =>
+  team.data.members.includes(member.slug),
 );
 
 // Find events that involved team members
-const teamEvents = eventsCollection.filter(event => 
-  event.data.participants.some((participantSlug: string) => 
-    teamMembers.some(member => member.slug === participantSlug)
-  )
+const teamEvents = eventsCollection.filter((event) =>
+  event.data.participants.some((participantSlug: string) =>
+    teamMembers.some((member) => member.slug === participantSlug),
+  ),
 );
 
 // Find events where this team received points
-const teamPointEvents = eventsCollection.filter(event => 
-  event.data.pointsLogs?.some((log: PointLog) => log.team === team.slug)
+const teamPointEvents = eventsCollection.filter((event) =>
+  event.data.pointsLogs?.some((log: PointLog) => log.team === team.slug),
 );
 
 // Destructure the calculated points
 const { goodPoints, badPoints, totalPoints } = pointsData;
 
 // Get points breakdown by source
-const manualGoodPoints = team.data.manualGoodPoints || team.data.goodPoints || 0;
+const manualGoodPoints =
+  team.data.manualGoodPoints || team.data.goodPoints || 0;
 const manualBadPoints = team.data.manualBadPoints || team.data.badPoints || 0;
 
 // Calculate game points
 const gamePoints = teamGames
-  .filter(game => game.data.winner === team.data.name)
+  .filter((game) => game.data.winner === team.data.name)
   .reduce((sum, game) => sum + (game.data.points || 0), 0);
 
 // Calculate event points
 const eventGoodPoints = teamPointEvents.reduce((sum, event) => {
-  const teamLogs = event.data.pointsLogs?.filter((log: PointLog) => 
-    log.team === team.slug && log.isGoodPoints
-  ) || [];
-  return sum + teamLogs.reduce((total: number, log: PointLog) => total + log.points, 0);
+  const teamLogs =
+    event.data.pointsLogs?.filter(
+      (log: PointLog) => log.team === team.slug && log.isGoodPoints,
+    ) || [];
+  return (
+    sum +
+    teamLogs.reduce((total: number, log: PointLog) => total + log.points, 0)
+  );
 }, 0);
 
 const eventBadPoints = teamPointEvents.reduce((sum, event) => {
-  const teamLogs = event.data.pointsLogs?.filter((log: PointLog) => 
-    log.team === team.slug && !log.isGoodPoints
-  ) || [];
-  return sum + teamLogs.reduce((total: number, log: PointLog) => total + log.points, 0);
+  const teamLogs =
+    event.data.pointsLogs?.filter(
+      (log: PointLog) => log.team === team.slug && !log.isGoodPoints,
+    ) || [];
+  return (
+    sum +
+    teamLogs.reduce((total: number, log: PointLog) => total + log.points, 0)
+  );
 }, 0);
 ---
 
-<Layout title={`${team.data.name} | Culture Cup`} description={`${team.data.name} team page`}>
-  <TopBar />
+<Layout
+  title={`${team.data.name} | Culture Cup`}
+  description={`${team.data.name} team page`}
+>
   <main>
     <section
       class="mb-16 bg-zu-light-primary dark:bg-zu-dark-primary"
@@ -152,11 +163,6 @@ const eventBadPoints = teamPointEvents.reduce((sum, event) => {
     >
       <div class="wrapper">
         <div class="grid h-[calc(100svh_-_3rem)] min-h-[600px]">
-          <div class="self-start">
-            <BannerMessage>
-              <p>Team Profile</p>
-            </BannerMessage>
-          </div>
           <div
             class="self-end pb-20 text-[3.5rem] font-extralight leading-[1.4] text-zu-light-banner-heading sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] lg:leading-[1.1] xl:text-[9.5rem] dark:text-zu-dark-banner-heading"
           >
@@ -165,13 +171,15 @@ const eventBadPoints = teamPointEvents.reduce((sum, event) => {
         </div>
       </div>
     </section>
-    
+
     <section>
-      <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
+      <div class="wrapper divider-b *:pb-20-alt *:mb-12-alt">
         <Prose>
           <LayoutSticky>
             <div slot="left" class="h-full">
-              <h1 class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]">
+              <h1
+                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
+              >
                 / Stats
               </h1>
             </div>
@@ -180,59 +188,97 @@ const eventBadPoints = teamPointEvents.reduce((sum, event) => {
                 <div class="absolute inset-0 flex items-center">
                   <div class="w-full border-t border-gray-300"></div>
                 </div>
-                <div class="relative z-10 inline-flex px-4 py-3 font-medium leading-5 text-4xl bg-white dark:bg-gray-900 rounded-full">
+                <div
+                  class="relative z-10 inline-flex px-4 py-3 font-medium leading-5 text-4xl bg-white dark:bg-gray-900 rounded-full"
+                >
                   {totalPoints} Points
                 </div>
               </div>
-              
+
               <!-- Points Breakdown -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300 border-2 border-green-200 dark:border-green-800">
-                  <h3 class="text-xl font-bold mb-2 text-green-700 dark:text-green-400">Good Points</h3>
-                  <p class="text-3xl font-bold text-green-600 dark:text-green-300">+{goodPoints}</p>
+                <div
+                  class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300 border-2 border-green-200 dark:border-green-800"
+                >
+                  <h3
+                    class="text-xl font-bold mb-2 text-green-700 dark:text-green-400"
+                  >
+                    Good Points
+                  </h3>
+                  <p
+                    class="text-3xl font-bold text-green-600 dark:text-green-300"
+                  >
+                    +{goodPoints}
+                  </p>
                 </div>
-                <div class="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300 border-2 border-red-200 dark:border-red-800">
-                  <h3 class="text-xl font-bold mb-2 text-red-700 dark:text-red-400">Bad Points</h3>
-                  <p class="text-3xl font-bold text-red-600 dark:text-red-300">-{badPoints}</p>
+                <div
+                  class="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300 border-2 border-red-200 dark:border-red-800"
+                >
+                  <h3
+                    class="text-xl font-bold mb-2 text-red-700 dark:text-red-400"
+                  >
+                    Bad Points
+                  </h3>
+                  <p class="text-3xl font-bold text-red-600 dark:text-red-300">
+                    -{badPoints}
+                  </p>
                 </div>
               </div>
-              
+
               <!-- Points Sources Breakdown -->
-              <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-10">
-                <h3 class="text-xl font-bold mb-4">Points Breakdown by Source</h3>
+              <div
+                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-10"
+              >
+                <h3 class="text-xl font-bold mb-4">
+                  Points Breakdown by Source
+                </h3>
                 <div class="space-y-4">
                   <div class="border-b pb-3">
                     <div class="flex justify-between mb-2">
                       <span class="font-medium">Manual Adjustments</span>
-                      <span class="font-bold">{manualGoodPoints - manualBadPoints} points</span>
+                      <span class="font-bold"
+                        >{manualGoodPoints - manualBadPoints} points</span
+                      >
                     </div>
                     <div class="flex justify-end space-x-4 text-sm">
-                      <span class="text-green-600 dark:text-green-400">+{manualGoodPoints} good</span>
-                      <span class="text-red-600 dark:text-red-400">-{manualBadPoints} bad</span>
+                      <span class="text-green-600 dark:text-green-400"
+                        >+{manualGoodPoints} good</span
+                      >
+                      <span class="text-red-600 dark:text-red-400"
+                        >-{manualBadPoints} bad</span
+                      >
                     </div>
                   </div>
-                  
+
                   <div class="border-b pb-3">
                     <div class="flex justify-between mb-2">
                       <span class="font-medium">Games</span>
                       <span class="font-bold">{gamePoints} points</span>
                     </div>
                     <div class="flex justify-end text-sm">
-                      <span class="text-green-600 dark:text-green-400">+{gamePoints} good</span>
+                      <span class="text-green-600 dark:text-green-400"
+                        >+{gamePoints} good</span
+                      >
                     </div>
                   </div>
-                  
+
                   <div class="border-b pb-3">
                     <div class="flex justify-between mb-2">
                       <span class="font-medium">Events</span>
-                      <span class="font-bold">{eventGoodPoints - eventBadPoints} points</span>
+                      <span class="font-bold"
+                        >{eventGoodPoints - eventBadPoints} points</span
+                      >
                     </div>
                     <div class="flex justify-end space-x-4 text-sm">
-                      <span class="text-green-600 dark:text-green-400">+{eventGoodPoints} good</span>
-                      <span class="text-red-600 dark:text-red-400">-{eventBadPoints} bad</span>
+                      <span class="text-green-600 dark:text-green-400"
+                        >+{eventGoodPoints} good</span
+                      >
+                      <span class="text-red-600 dark:text-red-400"
+                        >-{eventBadPoints} bad</span
+                      >
                     </div>
                   </div>
-                  
+
                   <div class="pt-2">
                     <div class="flex justify-between font-bold">
                       <span>Total</span>
@@ -241,168 +287,233 @@ const eventBadPoints = teamPointEvents.reduce((sum, event) => {
                   </div>
                 </div>
               </div>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300">
+                <div
+                  class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300"
+                >
                   <h3 class="text-xl font-bold mb-2">Team Rank</h3>
                   <p class="text-3xl font-bold">#{rank}</p>
                 </div>
-                <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300">
+                <div
+                  class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg transform hover:scale-105 transition-transform duration-300"
+                >
                   <h3 class="text-xl font-bold mb-2">Team Size</h3>
                   <p class="text-3xl font-bold">{teamMembers.length} Members</p>
                 </div>
               </div>
-              
-              {teamPointEvents.length > 0 && (
-                <div class="mb-10">
-                  <h3 class="text-2xl font-bold mb-4">Recent Points Activity</h3>
-                  <div class="grid grid-cols-1 gap-4">
-                    {teamPointEvents.map(event => {
-                      // Get only the points logs for this team
-                      const teamLogs = event.data.pointsLogs?.filter((log: PointLog) => log.team === team.slug) || [];
-                      const goodPoints = teamLogs.filter((log: PointLog) => log.isGoodPoints).reduce((sum: number, log: PointLog) => sum + log.points, 0);
-                      const badPoints = teamLogs.filter((log: PointLog) => !log.isGoodPoints).reduce((sum: number, log: PointLog) => sum + log.points, 0);
-                      const netPoints = goodPoints - badPoints;
-                      
-                      return (
-                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                          <div class="flex justify-between items-center mb-2">
-                            <a href={`/events/${event.slug}`} class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400">
-                              {event.data.name}
-                            </a>
-                            <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
-                              {new Date(event.data.date).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
-                            </div>
-                          </div>
-                          <div class="flex justify-between items-center">
-                            <div class="flex space-x-3">
-                              {goodPoints > 0 && (
-                                <div class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm">
-                                  +{goodPoints} good
-                                </div>
-                              )}
-                              {badPoints > 0 && (
-                                <div class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm">
-                                  -{badPoints} bad
-                                </div>
-                              )}
-                              <div class={`px-2 py-1 rounded-full text-sm ${netPoints >= 0 
-                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' 
-                                : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'}`}>
-                                Net: {netPoints}
+
+              {
+                teamPointEvents.length > 0 && (
+                  <div class="mb-10">
+                    <h3 class="text-2xl font-bold mb-4">
+                      Recent Points Activity
+                    </h3>
+                    <div class="grid grid-cols-1 gap-4">
+                      {teamPointEvents.map((event) => {
+                        // Get only the points logs for this team
+                        const teamLogs =
+                          event.data.pointsLogs?.filter(
+                            (log: PointLog) => log.team === team.slug,
+                          ) || [];
+                        const goodPoints = teamLogs
+                          .filter((log: PointLog) => log.isGoodPoints)
+                          .reduce(
+                            (sum: number, log: PointLog) => sum + log.points,
+                            0,
+                          );
+                        const badPoints = teamLogs
+                          .filter((log: PointLog) => !log.isGoodPoints)
+                          .reduce(
+                            (sum: number, log: PointLog) => sum + log.points,
+                            0,
+                          );
+                        const netPoints = goodPoints - badPoints;
+
+                        return (
+                          <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-center mb-2">
+                              <a
+                                href={`/events/${event.slug}`}
+                                class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {event.data.name}
+                              </a>
+                              <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
+                                {new Date(event.data.date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                )}
                               </div>
                             </div>
-                            <a href={`/events/${event.slug}`} class="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-                              View details →
-                            </a>
+                            <div class="flex justify-between items-center">
+                              <div class="flex space-x-3">
+                                {goodPoints > 0 && (
+                                  <div class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm">
+                                    +{goodPoints} good
+                                  </div>
+                                )}
+                                {badPoints > 0 && (
+                                  <div class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm">
+                                    -{badPoints} bad
+                                  </div>
+                                )}
+                                <div
+                                  class={`px-2 py-1 rounded-full text-sm ${
+                                    netPoints >= 0
+                                      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                                      : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+                                  }`}
+                                >
+                                  Net: {netPoints}
+                                </div>
+                              </div>
+                              <a
+                                href={`/events/${event.slug}`}
+                                class="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                              >
+                                View details →
+                              </a>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
-              
+                )
+              }
+
               <h3 class="text-2xl font-bold mb-4">Recent Games</h3>
               <div class="grid grid-cols-1 gap-4 mb-10">
-                {teamGames.length > 0 ? (
-                  teamGames.map(game => (
-                    <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                      <h4 class="text-xl font-bold">{game.data.name}</h4>
-                      <p class="mb-2">{game.data.description}</p>
-                      <div class="flex justify-between">
-                        <span>{game.data.date}</span>
-                        <span class={`font-bold ${game.data.winner === team.data.name ? "text-green-500" : "text-gray-500"}`}>
-                          {game.data.winner === team.data.name ? `Winner! 🏆 +${game.data.points || 0} points` : `Winner: ${game.data.winner}`}
-                        </span>
+                {
+                  teamGames.length > 0 ? (
+                    teamGames.map((game) => (
+                      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                        <h4 class="text-xl font-bold">{game.data.name}</h4>
+                        <p class="mb-2">{game.data.description}</p>
+                        <div class="flex justify-between">
+                          <span>{game.data.date}</span>
+                          <span
+                            class={`font-bold ${game.data.winner === team.data.name ? "text-green-500" : "text-gray-500"}`}
+                          >
+                            {game.data.winner === team.data.name
+                              ? `Winner! 🏆 +${game.data.points || 0} points`
+                              : `Winner: ${game.data.winner}`}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No games recorded yet.</p>
-                )}
+                    ))
+                  ) : (
+                    <p>No games recorded yet.</p>
+                  )
+                }
               </div>
-              
-              {teamEvents.length > 0 && (
-                <div>
-                  <h3 class="text-2xl font-bold mb-4">Events with Team Members</h3>
-                  <div class="grid grid-cols-1 gap-4">
-                    {teamEvents.map(event => {
-                      // Count how many team members participated in this event
-                      const participatingMembers = teamMembers.filter(member => 
-                        event.data.participants.includes(member.slug)
-                      );
-                      
-                      return (
-                        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                          <div class="flex justify-between items-center">
-                            <a href={`/events/${event.slug}`} class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400">
-                              {event.data.name}
-                            </a>
-                            <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
-                              {new Date(event.data.date).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
+
+              {
+                teamEvents.length > 0 && (
+                  <div>
+                    <h3 class="text-2xl font-bold mb-4">
+                      Events with Team Members
+                    </h3>
+                    <div class="grid grid-cols-1 gap-4">
+                      {teamEvents.map((event) => {
+                        // Count how many team members participated in this event
+                        const participatingMembers = teamMembers.filter(
+                          (member) =>
+                            event.data.participants.includes(member.slug),
+                        );
+
+                        return (
+                          <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                              <a
+                                href={`/events/${event.slug}`}
+                                class="text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {event.data.name}
+                              </a>
+                              <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
+                                {new Date(event.data.date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                )}
+                              </div>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1">
+                              {participatingMembers.length} team member
+                              {participatingMembers.length !== 1
+                                ? "s"
+                                : ""}{" "}
+                              participated
+                            </p>
+                            <div class="flex mt-2 flex-wrap gap-2">
+                              {participatingMembers
+                                .slice(0, 5)
+                                .map((member) => (
+                                  <div class="flex items-center bg-white dark:bg-gray-700 px-2 py-1 rounded-full text-sm">
+                                    {member.data.name}
+                                  </div>
+                                ))}
+                              {participatingMembers.length > 5 && (
+                                <div class="flex items-center bg-white dark:bg-gray-700 px-2 py-1 rounded-full text-sm">
+                                  +{participatingMembers.length - 5} more
+                                </div>
+                              )}
                             </div>
                           </div>
-                          <p class="text-gray-600 dark:text-gray-400 mt-1">
-                            {participatingMembers.length} team member{participatingMembers.length !== 1 ? 's' : ''} participated
-                          </p>
-                          <div class="flex mt-2 flex-wrap gap-2">
-                            {participatingMembers.slice(0, 5).map(member => (
-                              <div class="flex items-center bg-white dark:bg-gray-700 px-2 py-1 rounded-full text-sm">
-                                {member.data.name}
-                              </div>
-                            ))}
-                            {participatingMembers.length > 5 && (
-                              <div class="flex items-center bg-white dark:bg-gray-700 px-2 py-1 rounded-full text-sm">
-                                +{participatingMembers.length - 5} more
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )
+              }
             </div>
           </LayoutSticky>
-          
+
           <LayoutSticky>
             <div slot="left" class="h-full">
-              <h1 class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]">
+              <h1
+                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
+              >
                 / Members
               </h1>
             </div>
             <div slot="right" class="mt-2.5">
               <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-                {teamMembers.map(member => (
-                  <div class="flex flex-col items-center group">
-                    <div class="overflow-hidden rounded-lg mb-4">
-                      <img
-                        src={member.data.image}
-                        alt={member.data.name}
-                        width="200"
-                        height="200"
-                        class="object-cover transition-transform duration-300 transform group-hover:scale-110"
-                        style={{
-                          transform: `rotate(${Math.random() > 0.5 ? '3deg' : '-3deg'}) scale(0.95)`,
-                        }}
-                        onmouseover="this.style.transform='rotate(0deg) scale(1)'"
-                        onmouseout={`this.style.transform='rotate(${Math.random() > 0.5 ? '3deg' : '-3deg'}) scale(0.95)'`}
-                      />
+                {
+                  teamMembers.map((member) => (
+                    <div class="flex flex-col items-center group">
+                      <div class="overflow-hidden rounded-lg mb-4">
+                        <img
+                          src={member.data.image}
+                          alt={member.data.name}
+                          width="200"
+                          height="200"
+                          class="object-cover transition-transform duration-300 transform group-hover:scale-110"
+                          style={{
+                            transform: `rotate(${Math.random() > 0.5 ? "3deg" : "-3deg"}) scale(0.95)`,
+                          }}
+                          onmouseover="this.style.transform='rotate(0deg) scale(1)'"
+                          onmouseout={`this.style.transform='rotate(${Math.random() > 0.5 ? "3deg" : "-3deg"}) scale(0.95)'`}
+                        />
+                      </div>
+                      <h3 class="text-xl font-bold text-center">
+                        {member.data.name}
+                      </h3>
+                      <p class="text-gray-600 dark:text-gray-400 text-center">
+                        {member.data.position}
+                      </p>
                     </div>
-                    <h3 class="text-xl font-bold text-center">{member.data.name}</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-center">{member.data.position}</p>
-                  </div>
-                ))}
+                  ))
+                }
               </div>
             </div>
           </LayoutSticky>
@@ -418,4 +529,4 @@ const eventBadPoints = teamPointEvents.reduce((sum, event) => {
     transform: rotateY(180deg);
     transition: transform 0.6s;
   }
-</style> 
+</style>

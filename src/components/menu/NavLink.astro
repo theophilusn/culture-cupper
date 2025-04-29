@@ -1,0 +1,42 @@
+---
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1);
+
+interface Props {
+  text: string;
+  href: string;
+  id?: string;
+  classes?: string;
+}
+
+const { text, href, id, classes = "" } = Astro.props;
+---
+
+<li class:list={[currentPath.includes(href) ? "" : "group/links"]}>
+  <a
+    href={`/${href}`}
+    class:list={["relative flex items-start overflow-hidden", classes]}
+    aria-current={currentPath.startsWith(href) ? "page" : undefined}
+    tabindex="0"
+    id={id}
+  >
+    <div
+      class:list={[
+        "absolute",
+        currentPath.split("/").includes(href.split("/")[0])
+          ? []
+          : [
+              "-top-20",
+              "left-6",
+              "transition-all",
+              "group-hover/links:left-0",
+              "group-hover/links:top-0",
+            ],
+      ]}
+      aria-hidden="true"
+    >
+      /
+    </div>
+    <div class="ml-2">{text}</div>
+  </a>
+</li>

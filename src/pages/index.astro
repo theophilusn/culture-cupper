@@ -1,7 +1,5 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import TopBar from "@/components/TopBar.astro";
-import BannerMessage from "@/components/BannerMessage.astro";
 import Footer from "@/components/Footer.astro";
 import LayoutSticky from "@/layouts/LayoutSticky.astro";
 import Prose from "@/components/Prose.astro";
@@ -19,14 +17,14 @@ const tournamentsCollection = await getCollection("tournaments");
 
 // Get tournaments to display on homepage
 const homepageTournaments = tournamentsCollection.filter(
-  (tournament) => tournament.data.showOnHomepage
+  (tournament) => tournament.data.showOnHomepage,
 );
 
 // Format tournament data for the TournamentBracket component
 const formattedTournaments = await Promise.all(
   homepageTournaments.map(async (tournament) => {
     return await formatTournamentData(tournament, membersCollection);
-  })
+  }),
 );
 
 // Calculate total points for each team using the pointsCalculator
@@ -36,35 +34,39 @@ const teamsWithPoints = await Promise.all(
       team.slug,
       teamsCollection,
       gamesCollection,
-      eventsCollection
+      eventsCollection,
     );
-    
+
     return {
       name: team.data.name,
       points: pointsData.totalPoints,
-      slug: team.slug
+      slug: team.slug,
     };
-  })
+  }),
 );
 
 // Sort teams by total points (highest first)
 const sortedTeams = teamsWithPoints.sort((a, b) => b.points - a.points);
 
 // Format team data for the bar chart
-const barChartData = sortedTeams.map(team => ({
+const barChartData = sortedTeams.map((team) => ({
   name: team.name,
   points: team.points,
   // Assign colors based on team name for consistency
-  color: 
-    team.slug === "zu_rassic_park" ? "#1A56DB" : 
-    team.slug === "the_standard" ? "#16A34A" : 
-    team.slug === "karens_favourites" ? "#CA8A04" : 
-    team.slug === "ms_paint_2" ? "#DC2626" : "#6366F1"
+  color:
+    team.slug === "zu_rassic_park"
+      ? "#1A56DB"
+      : team.slug === "the_standard"
+        ? "#16A34A"
+        : team.slug === "karens_favourites"
+          ? "#CA8A04"
+          : team.slug === "ms_paint_2"
+            ? "#DC2626"
+            : "#6366F1",
 }));
 ---
 
 <Layout title="Culture Cup" description="The Zuluru Culture Cup">
-  <TopBar />
   <main>
     <section
       class="mb-16 bg-zu-light-primary dark:bg-zu-dark-primary"
@@ -72,11 +74,6 @@ const barChartData = sortedTeams.map(team => ({
     >
       <div class="wrapper">
         <div class="grid h-[calc(100svh_-_3rem)] min-h-[600px]">
-          <div class="self-start">
-            <BannerMessage>
-              <p>Welcome to the</p>
-            </BannerMessage>
-          </div>
           <div
             class="self-end pb-20 text-[3.5rem] font-extralight leading-[1.4] text-zu-light-banner-heading sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] lg:leading-[1.1] xl:text-[9.5rem] dark:text-zu-dark-banner-heading"
           >
@@ -86,56 +83,10 @@ const barChartData = sortedTeams.map(team => ({
         </div>
       </div>
     </section>
-    <section>
-      <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
-        <Prose>
-          <LayoutSticky>
-            <div slot="left" class="h-full">
-              <h1
-                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
-              >
-                / Teams
-              </h1>
-            </div>
-            <div slot="right" class="mt-2.5">
-              {teamsCollection.map((team) => {
-                const teamMembers = membersCollection.filter(
-                  (member) => team.data.members.includes(member.slug)
-                );
-                return (
-                  <div class="mb-16">
-                    <a
-                      href={`/teams/${team.slug}`}
-                      class="flex justify-between items-center mb-8 hover:text-blue-600"
-                    >
-                      <h2 class="text-3xl font-bold">{team.data.name}</h2>
-                      <span class="text-xl">View Team →</span>
-                    </a>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-                      {membersCollection
-                        .filter((member) => team.data.members.includes(member.slug))
-                        .map((member) => (
-                          <div class="flex flex-col items-center">
-                            <img
-                              src={member.data.image}
-                              alt={member.data.name}
-                              width="200"
-                              height="200"
-                              class="object-cover scale-90 hover:scale-100 hover:rotate-0 transition-transform duration-300"
-                              style={{
-                                transform: `rotate(${Math.random() > 0.5 ? '6deg' : '-3deg'}) scale(${Math.random() > 0.5 ? '1.05' : '1'})`,
-                              }}
-                            />
-                            <p class="text-center text-lg font-bold mt-4">{member.data.name}</p>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                );
-              })}
 
-            </div>
-          </LayoutSticky>
+    <section>
+      <div class="wrapper *:pb-20-alt *:mb-12-alt">
+        <Prose>
           <LayoutSticky>
             <div slot="left" class="h-full">
               <h1
@@ -151,32 +102,86 @@ const barChartData = sortedTeams.map(team => ({
                 How things are breaking down:
               </h2>
 
-              <BarChart teamData={barChartData} title="Team Points Leaderboard" height={350} />
+              <BarChart
+                teamData={barChartData}
+                title="Team Points Leaderboard"
+                height={350}
+              />
+            </div>
+          </LayoutSticky>
+
+          <LayoutSticky>
+            <div slot="left" class="h-full">
+              <h1
+                class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
+              >
+                / Teams
+              </h1>
+            </div>
+            <div slot="right" class="mt-2.5">
+              {
+                teamsCollection.map((team) => {
+                  const teamMembers = membersCollection.filter((member) =>
+                    team.data.members.includes(member.slug),
+                  );
+                  return (
+                    <div class="mb-16">
+                      <a
+                        href={`/teams/${team.slug}`}
+                        class="flex justify-between items-center mb-8 hover:text-blue-600"
+                      >
+                        <h2 class="text-3xl font-bold">{team.data.name}</h2>
+                        <span class="text-xl">View Team →</span>
+                      </a>
+                      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
+                        {membersCollection
+                          .filter((member) =>
+                            team.data.members.includes(member.slug),
+                          )
+                          .map((member) => (
+                            <div class="flex flex-col items-center">
+                              <img
+                                src={member.data.image}
+                                alt={member.data.name}
+                                width="200"
+                                height="200"
+                                class="object-cover transition-all duration-300 rounded-3xl hover:rounded-none"
+                              />
+                              <p class="text-center text-lg font-bold mt-4">
+                                {member.data.name}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  );
+                })
+              }
             </div>
           </LayoutSticky>
         </Prose>
       </div>
     </section>
-    {formattedTournaments.map((tournament) => (
-      <section>
-        <div class="wrapper wrapper-divider *:pb-20-alt *:mb-12-alt">
-          <Prose>
-            <LayoutSticky>
-              <div slot="left" class="h-full">
-                <h1
-                  class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]"
-                >
-                  / {tournament.name}
-                </h1>
-              </div>
-              <div slot="right" class="mt-2.5">
-                <TournamentBracket tournament={tournament} />
-              </div>
-            </LayoutSticky>
-          </Prose>
-        </div>
-      </section>
-    ))}
+    <!-- {
+      formattedTournaments.map((tournament) => (
+        <section>
+          <div class="wrapper divider-b *:pb-20-alt *:mb-12-alt">
+            <Prose>
+              <LayoutSticky>
+                <div slot="left" class="h-full">
+                  <h1 class="sticky top-8 text-[1.375rem] font-bold uppercase leading-[48px]">
+                    / {tournament.name}
+                  </h1>
+                </div>
+                <div slot="right" class="mt-2.5">
+                  <TournamentBracket tournament={tournament} />
+                </div>
+              </LayoutSticky>
+            </Prose>
+          </div>
+        </section>
+      ))
+    } -->
   </main>
   <Footer />
 </Layout>

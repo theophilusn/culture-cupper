@@ -1,0 +1,218 @@
+---
+import TopLogo from "./TopLogo.astro";
+import NavLink from "./NavLink.astro";
+import { links } from "@/components/menu/links.ts";
+---
+
+<section class="z-10 container hidden px-0 lg:block">
+  <div
+    class="inner-menu fixed top-8 z-10 text-black dark:text-white"
+    id="desktop-menu-container"
+    data-testid="desktop-menu-container"
+  >
+    <div class="relative flex items-center justify-between overflow-hidden">
+      <TopLogo />
+      <nav class="absolute relative right-0 *:transition-all *:duration-500">
+        <button
+          class="stop-scrollbar-hide desktopMenuOpen-close absolute -top-[13.5px] right-0 cursor-pointer uppercase"
+          id="desktop-menu-open"
+        >
+          Menu
+        </button>
+        <ul
+          class="stop-scrollbar-hide absolute -top-[20px] right-0 flex gap-8"
+          id="desktop-menu-items"
+          data-testid="desktop-menu-items"
+        >
+          {
+            links.map((link) => {
+              return <NavLink text={link.text} href={link.href} />;
+            })
+          }
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    let isDesktopMenuOpen = true;
+    let lastY = 0;
+    let shouldColorFlip = true;
+
+    const desktopMenuOpen = document.getElementById("desktop-menu-open");
+    const desktopMenuItems = document.getElementById("desktop-menu-items");
+    const desktopMenuContainer = document.getElementById(
+      "desktop-menu-container",
+    );
+
+    function showMenuLinks() {
+      if (isDesktopMenuOpen) return;
+      desktopMenuOpen?.classList.remove("desktopMenuOpen-open");
+      desktopMenuOpen?.classList.add("desktopMenuOpen-close");
+
+      desktopMenuItems?.classList.remove("desktopMenuItems-close");
+      desktopMenuItems?.classList.add("desktopMenuItems-open");
+      isDesktopMenuOpen = true;
+    }
+
+    function hideMenuLinks() {
+      if (!isDesktopMenuOpen) return;
+      desktopMenuOpen?.classList.remove("desktopMenuOpen-close");
+      desktopMenuOpen?.classList.add("desktopMenuOpen-open");
+
+      desktopMenuItems?.classList.remove("desktopMenuItems-open");
+      desktopMenuItems?.classList.add("desktopMenuItems-close");
+      isDesktopMenuOpen = false;
+    }
+
+    function desktopMenuScrollBehaviour() {
+      if (scrollY - lastY <= -20) {
+        showMenuLinks();
+        isDesktopMenuOpen = true;
+      } else if (scrollY - lastY >= 20) {
+        hideMenuLinks();
+        isDesktopMenuOpen = false;
+      }
+    }
+
+    desktopMenuOpen?.addEventListener("click", () => {
+      if (isDesktopMenuOpen) return;
+      showMenuLinks();
+    });
+
+    let bouncer = 0;
+    document.addEventListener(
+      "scroll",
+      () => {
+        if (bouncer < 3) {
+          bouncer++;
+          return;
+        }
+        bouncer = 0;
+        if (shouldColorFlip) {
+          requestAnimationFrame(updateMenuColor);
+        }
+        if (Math.abs(window.scrollY - lastY) < 20) return;
+        desktopMenuScrollBehaviour();
+        lastY = window.scrollY;
+      },
+      { passive: true },
+    );
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Tab") {
+        showMenuLinks();
+      }
+    });
+
+    const menuHeight = 80; // Height of the menu area
+    const firstSection =
+      document.querySelector("main > section:first-child") ||
+      document.querySelector("main header:first-of-type");
+
+    function updateMenuColor() {
+      if (!desktopMenuContainer || !firstSection) return;
+
+      // Get current scroll position plus menu height to check where the menu bottom is
+      const scrollPosition = window.scrollY + menuHeight;
+      const rect = firstSection.getBoundingClientRect();
+      const sectionTop = window.scrollY + rect.top;
+      const sectionBottom = sectionTop + rect.height;
+
+      // If we're in the first section, menu should be white
+      const isInFirstSection =
+        scrollPosition >= sectionTop && scrollPosition <= sectionBottom;
+
+      if (isInFirstSection) {
+        desktopMenuContainer.classList.remove("text-black", "dark:text-white");
+        desktopMenuContainer.classList.add("text-white");
+      } else {
+        desktopMenuContainer.classList.remove("text-white");
+        desktopMenuContainer.classList.add("text-black", "dark:text-white");
+      }
+    }
+
+    // Color flipping functionality
+    function setupMenuColorFlipping() {
+      // Skip if first section has data-skip-menu-color
+      if (firstSection?.hasAttribute("data-skip-menu-color")) {
+        shouldColorFlip = false;
+        return;
+      }
+      // Initial update
+      updateMenuColor();
+    }
+
+    // Setup color flipping after page load
+    setupMenuColorFlipping();
+  });
+</script>
+
+<style>
+  .desktopMenuOpen-close {
+    opacity: 0;
+    top: -30px;
+  }
+
+  .desktopMenuOpen-open {
+    opacity: 1;
+    top: -13.5px;
+  }
+
+  .desktopMenuItems-close {
+    opacity: 0;
+    top: 30px;
+  }
+
+  .desktopMenuItems-open {
+    opacity: 1;
+    top: -20px;
+  }
+
+  /* Stops the rightmost link item and the menu button from hiding under the scrollbar */
+  .stop-scrollbar-hide {
+    @media (min-width: 1024px) and (max-width: 1034px) {
+      right: 16px;
+    }
+    @media (min-width: 1034px) and (max-width: 1044px) {
+      right: 8px;
+    }
+
+    @media (min-width: 1280px) and (max-width: 1290px) {
+      right: 16px;
+    }
+    @media (min-width: 1290px) and (max-width: 1300px) {
+      right: 8px;
+    }
+
+    @media (min-width: 1536px) and (max-width: 1546px) {
+      right: 16px;
+    }
+    @media (min-width: 1546px) and (max-width: 1556px) {
+      right: 8px;
+    }
+  }
+
+  .inner-menu {
+    @media (width >= 400px) {
+      width: calc(400px);
+    }
+    @media (width >= 40rem) {
+      width: calc(40rem);
+    }
+    @media (width >= 48rem) {
+      width: calc(48rem);
+    }
+    @media (width >= 64rem) {
+      width: calc(64rem);
+    }
+    @media (width >= 80rem) {
+      width: calc(80rem);
+    }
+    @media (width >= 96rem) {
+      width: calc(96rem);
+    }
+  }
+</style>

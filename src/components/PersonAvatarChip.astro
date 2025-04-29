@@ -1,0 +1,20 @@
+---
+interface Props {
+  member: any;
+}
+
+const { member } = Astro.props;
+---
+
+<div
+  class="flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-2 hover:text-white transition-all duration-500"
+>
+  <div class="w-12 h-12 rounded-full overflow-hidden mr-2">
+    <img
+      src={member.data.image}
+      alt={member.data.name}
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <span>{member.data.name}</span>
+</div>

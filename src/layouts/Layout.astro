@@ -1,7 +1,8 @@
 ---
 import { ViewTransitions } from "astro:transitions";
 import "../styles/base.css";
-import Menu from "../components/Menu.astro";
+import DesktopTopBar from "@/components/menu/DesktopTopBar.astro";
+import MobileTopBar from "@/components/menu/MobileTopBar.astro";
 
 interface Props {
   title: string;
@@ -21,14 +22,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Basic Meta Tags -->
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
     <meta name="robots" content="index, follow" />
 
-    <!-- Favicon and App Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -37,7 +36,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     <meta name="msapplication-TileColor" content="#000000" />
     <meta name="theme-color" content="#ffffff" />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -51,12 +49,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     />
     <ViewTransitions />
   </head>
-  <body class="bg-zu-light-bg dark:bg-zu-dark-bg" data-page-id={pageId}>
-    <slot />
-    <Menu />
-    <script
-      is:inline
-      src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"
-    ></script>
+  <body class="bg-zu-light-bg dark:bg-zu-dark-bg">
+    <!--
+      DO NOT REMOVE: overflow-hidden lg:overflow-auto
+      This keeps the screen from overflowing because of the mobile menu background
+    -->
+    <div
+      class="relative overflow-hidden lg:overflow-x-hidden lg:overflow-y-auto"
+    >
+      <DesktopTopBar />
+      <MobileTopBar />
+      <slot />
+    </div>
   </body>
 </html>

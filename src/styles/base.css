@@ -2,36 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-https://docs.astro.build/en/guides/integrations-guide/tailwind/#applybasestyles
-*/
-
 @layer base {
-  /*
-    Body highlight in light mode is a bit darker
-    Body highlight in dark mode is a bit lighter
-     */
   :root {
     --color-zu-light-primary: 255 61 0; /* #FF3D00 */
     --color-zu-light-heading: 14 17 17; /* #0E1111 */
     --color-zu-light-body-text: 14 17 17; /* #0E1111 */
     --color-zu-light-body-highlight: 14 17 17; /* #0E1111 */
     --color-zu-light-bg: 255 255 255; /* #FFFFFF */
-    /*--color-zu-light-bg-partner: 248 248 248; !* #F8F8F8 *!*/
     --color-zu-light-bg-partner: 240 240 240; /* #F0F0F0 */
-    /*--color-zu-light-bg-partner: 235 235 235; !* #EBEBEB *!*/
-    /*--color-zu-light-bg-partner: 230 230 230; !* #E6E6E6 *! !* RECOMMEND *!*/
     --color-zu-light-bg-footer: 14 17 17; /* #0E1111 */
     --color-zu-light-placeholder: 119 119 119; /* #777 */
     --color-zu-light-banner-heading: 250 250 250; /* #FAFAFA */
 
-    /*--color-zu-dark-primary: 139 0 0; !* #8b0000 *!*/
-    /*--color-zu-dark-primary: 128 0 0; !* #800000 *!*/
-    /*--color-zu-dark-primary: 220 20 60; !* #dc143c *!*/
-    /*--color-zu-dark-primary: 210 105 30; !* #d2691e *!*/
-    /*--color-zu-dark-primary: 0 128 128; !* #008080 *!*/
     --color-zu-dark-primary: 178 44 0; /* #008080 */
-    /*--color-zu-dark-primary: 0 177 167; !* #00B1A7 *!*/
     --color-zu-dark-heading: 236 236 236; /* #ECECEC */
     --color-zu-dark-body-text: 173 173 173; /* #ADADAD */
     --color-zu-dark-body-highlight: 196 196 196; /* #C4C4C4 */
@@ -45,8 +28,6 @@ https://docs.astro.build/en/guides/integrations-guide/tailwind/#applybasestyles
   html {
     scroll-behavior: smooth;
   }
-
-  /* We don't want to choose a color that will compete with the primary color. */
   ::selection {
     background-color: #ffc4b2;
     color: #0e1111;
@@ -189,41 +170,8 @@ https://docs.astro.build/en/guides/integrations-guide/tailwind/#applybasestyles
     grid-column: 1 / 4;
   }
 
-  .wrapper-divider > * {
+  .divider-b {
     @apply border-b border-zu-light-body-highlight dark:border-zu-dark-body-highlight;
-  }
-
-  /* CURSOR */
-  .cursor {
-    border-right: 4px solid white;
-    min-width: 10px;
-    height: 100%;
-    animation: cursor 0.8s alternate infinite;
-  }
-
-  /* BACKGROUND IMAGES */
-  .bg-skt-light {
-    background-image: linear-gradient(103deg, #d3178e 34.46%, #ff6d1b 94.78%);
-  }
-  .bg-sha-light {
-    background-image: linear-gradient(285deg, #61a644 14.07%, #026936 89.72%);
-  }
-  .bg-cor-light {
-    background-image: linear-gradient(149deg, #0270b3, #014c83);
-  }
-  .bg-sdb-light {
-    background: linear-gradient(297.48deg, #64a70b 3.86%, #046a38 77.11%);
-  }
-
-  .bg-pip-light {
-    background-image: linear-gradient(
-      148.89deg,
-      #0270b3 21.01%,
-      #014c83 81.02%
-    );
-  }
-  .bg-gms-light {
-    background-image: linear-gradient(149deg, #5b4b88 21.01%, #3d376a 81.02%);
   }
 
   .bg-zu-light-y-line {

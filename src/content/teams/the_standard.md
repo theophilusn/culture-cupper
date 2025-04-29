@@ -8,7 +8,6 @@ members:
   - jason-leibel
   - michael-sabares
   - jen-korney
-  - valerie-chan
   - rebecca-ready
   - mackenzie-petros
 goodPoints: 165
