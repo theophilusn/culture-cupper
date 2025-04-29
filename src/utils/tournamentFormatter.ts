@@ -1,4 +1,4 @@
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 interface Participant {
   id: string;
@@ -19,20 +19,20 @@ interface FormattedTournament {
 }
 
 export async function formatTournamentData(
-  tournament: CollectionEntry<'tournaments'>,
-  members: CollectionEntry<'members'>[]
+  tournament: CollectionEntry<"tournaments">,
+  members: CollectionEntry<"members">[],
 ): Promise<FormattedTournament> {
   // Format the tournament data for the TournamentBracket component
-  const formattedMatches = tournament.data.matches.map((match) => {
-    const formattedParticipants = match.participants.map((participant) => {
+  const formattedMatches = tournament.data.matches.map((match: any) => {
+    const formattedParticipants = match.participants.map((participant: any) => {
       // Find the member data
       const memberData = members.find(
-        (member) => member.slug === participant.member.slug
+        (member) => member.slug === participant.member.slug,
       );
 
       return {
         id: participant.member.slug,
-        name: memberData?.data.name || 'Unknown',
+        name: memberData?.data.name || "Unknown",
         image: memberData?.data.image,
         isWinner: participant.isWinner,
       };
@@ -49,4 +49,4 @@ export async function formatTournamentData(
     name: tournament.data.name,
     matches: formattedMatches,
   };
-} 
+}

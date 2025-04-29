@@ -6,26 +6,11 @@ import Prose from "@/components/Prose.astro";
 import { getCollection } from "astro:content";
 import BarChart from "@/components/BarChart.astro";
 import { calculateTeamPoints } from "@/utils/pointsCalculator";
-import TournamentBracket from "@/components/TournamentBracket.astro";
-import { formatTournamentData } from "@/utils/tournamentFormatter";
 
 const teamsCollection = await getCollection("teams");
 const membersCollection = await getCollection("members");
 const gamesCollection = await getCollection("games");
 const eventsCollection = await getCollection("events");
-const tournamentsCollection = await getCollection("tournaments");
-
-// Get tournaments to display on homepage
-const homepageTournaments = tournamentsCollection.filter(
-  (tournament) => tournament.data.showOnHomepage,
-);
-
-// Format tournament data for the TournamentBracket component
-const formattedTournaments = await Promise.all(
-  homepageTournaments.map(async (tournament) => {
-    return await formatTournamentData(tournament, membersCollection);
-  }),
-);
 
 // Calculate total points for each team using the pointsCalculator
 const teamsWithPoints = await Promise.all(
