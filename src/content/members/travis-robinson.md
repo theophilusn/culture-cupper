@@ -1,6 +1,6 @@
 ---
 name: Travis Robinson
 position: Product Owner
-image: /src/assets/images/travis-robinson.jpeg
+image: ../../assets/images/travis-robinson.jpeg
 slug: travis-robinson
 ---
